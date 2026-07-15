@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1c1712">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sardegna">
 <title>The Lost Princess of Sardegna</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f5eed8'/%3E%3Crect x='6' width='4' height='16' fill='%23a4161a'/%3E%3Crect y='6' width='16' height='4' fill='%23a4161a'/%3E%3C/svg%3E">
 <style>
@@ -73,7 +77,7 @@ button{font-family:var(--serif);color:var(--ink);cursor:pointer}
 /* grain + weathering vignette centred on Orosei (737,244) */
 .grain{position:absolute;inset:0;z-index:14;pointer-events:none;opacity:.5;border-radius:5px}
 .vignette{position:absolute;inset:0;z-index:15;pointer-events:none;border-radius:5px;mix-blend-mode:multiply;
-  background:radial-gradient(1150px 760px at 737px 244px, rgba(255,250,235,0) 26%, rgba(140,110,55,.10) 55%, rgba(104,78,34,.22) 78%, rgba(70,50,20,.38) 100%)}
+  background:radial-gradient(1150px 760px at 728px 234px, rgba(255,250,235,0) 26%, rgba(140,110,55,.10) 55%, rgba(104,78,34,.22) 78%, rgba(70,50,20,.38) 100%)}
 
 /* rhumb lines svg spans whole board, beneath panels */
 .rhumbs{position:absolute;inset:0;z-index:1;pointer-events:none}
@@ -179,8 +183,14 @@ li.done .mlab{color:var(--ink-soft)}
 
 .zoomctl{position:fixed;left:calc(3px + env(safe-area-inset-left,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;gap:6px}
 .zbtn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);font-size:15px;line-height:1;opacity:.92;
+  display:grid;place-items:center;
   background:radial-gradient(circle at 35% 30%, var(--parch-hi), var(--parch) 70%, var(--parch-lo));
   box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.5);color:var(--ink)}
+.beginbtn{display:inline-block;border:1.5px solid var(--red-deep);border-radius:3px;
+  background:radial-gradient(circle at 35% 28%,#c03a34,var(--red) 60%,var(--red-deep));color:var(--parch-hi);
+  font-variant-caps:small-caps;letter-spacing:.1em;font-size:15px;padding:9px 22px;transform:rotate(-.5deg);
+  box-shadow:inset 0 -3px 5px rgba(50,4,6,.5), 0 2px 6px rgba(40,20,8,.35)}
+.beginbtn:active{transform:rotate(-.5deg) scale(.96)}
 .zbtn:active{transform:scale(.93)}
 
 .rotate-hint{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:70;display:none;align-items:center;gap:7px;
@@ -350,7 +360,7 @@ li.done .mlab{color:var(--ink-soft)}
       <!-- the island -->
       <svg class="mapsvg" viewBox="0 0 410 470" aria-label="Old sailor’s map of Sardegna">
         <defs>
-          <radialGradient id="oroFade" gradientUnits="userSpaceOnUse" cx="228" cy="192" r="300">
+          <radialGradient id="oroFade" gradientUnits="userSpaceOnUse" cx="226" cy="190" r="300">
             <stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff"/>
             <stop offset=".75" stop-color="#9a9a9a"/><stop offset="1" stop-color="#5c5c5c"/>
           </radialGradient>
@@ -358,12 +368,14 @@ li.done .mlab{color:var(--ink-soft)}
         </defs>
         <g mask="url(#oroMask)">
           <!-- coast shading then coastline -->
-          <path class="coast2" d="M96,54 L92,40 L100,46 C108,38 118,34 128,40 C140,34 150,40 158,34 C170,28 182,34 190,30 C200,26 210,32 214,42 C210,50 216,54 212,62 C222,66 220,76 216,84 C222,94 224,106 220,116 C226,124 222,134 224,142 C228,152 226,164 230,172 C232,180 228,186 231,193 C224,204 219,214 222,228 C228,238 226,248 232,256 C238,266 234,272 240,278 C236,292 240,304 234,316 C238,330 232,344 236,356 C230,370 234,382 226,392 C220,402 210,404 204,412 C194,402 186,398 178,402 C170,406 164,402 156,408 C146,414 140,422 132,418 C122,426 112,432 104,424 C96,434 90,426 92,416 C86,404 90,392 84,380 C88,366 82,352 86,340 C80,326 84,314 78,302 C88,296 92,288 86,280 C78,272 72,264 78,256 C74,244 78,230 72,218 C76,206 70,194 74,182 C68,170 72,158 66,146 C60,136 66,124 62,112 L54,108 L62,104 C64,92 70,82 68,72 C74,64 82,60 88,58 C90,56 94,56 96,54 Z"/>
-          <path class="coast" d="M96,54 L92,40 L100,46 C108,38 118,34 128,40 C140,34 150,40 158,34 C170,28 182,34 190,30 C200,26 210,32 214,42 C210,50 216,54 212,62 C222,66 220,76 216,84 C222,94 224,106 220,116 C226,124 222,134 224,142 C228,152 226,164 230,172 C232,180 228,186 231,193 C224,204 219,214 222,228 C228,238 226,248 232,256 C238,266 234,272 240,278 C236,292 240,304 234,316 C238,330 232,344 236,356 C230,370 234,382 226,392 C220,402 210,404 204,412 C194,402 186,398 178,402 C170,406 164,402 156,408 C146,414 140,422 132,418 C122,426 112,432 104,424 C96,434 90,426 92,416 C86,404 90,392 84,380 C88,366 82,352 86,340 C80,326 84,314 78,302 C88,296 92,288 86,280 C78,272 72,264 78,256 C74,244 78,230 72,218 C76,206 70,194 74,182 C68,170 72,158 66,146 C60,136 66,124 62,112 L54,108 L62,104 C64,92 70,82 68,72 C74,64 82,60 88,58 C90,56 94,56 96,54 Z"/>
+          <path class="coast2" d="M88,60 L84,42 L88,48 L94,58 Q98,66 104,64 L112,68 L120,63 L130,69 L138,63 L148,68 L156,61 L164,54 L168,45 L172,38 L177,43 L179,34 L185,40 L191,35 L197,43 L203,37 L207,47 L215,45 L213,55 L221,57 L217,65 L225,67 L215,73 L219,79 L227,79 L231,87 L227,95 L235,101 L227,111 L231,123 L226,133 L229,141 L237,151 L242,159 L235,167 L231,177 L228,185 L226,190 C218,202 211,214 213,230 C214,244 219,252 223,262 C226,272 229,280 235,290 L243,299 L247,308 L240,315 L236,329 L241,341 L234,353 L240,363 L233,371 L239,381 L246,391 L240,398 L231,394 L227,388 Q216,394 208,389 L196,384 L184,389 L174,387 L164,395 L154,403 L147,413 L139,423 L131,419 L125,428 L117,431 L112,423 L105,416 L101,420 L98,410 L95,399 L100,389 L94,377 L99,365 L92,353 L87,343 L94,335 Q102,330 104,320 L99,308 L89,301 L84,307 L81,298 L87,291 L91,283 L82,277 L88,270 L84,257 L89,243 L83,229 L87,215 L80,201 L75,192 L81,184 L77,172 L83,163 L73,158 L66,163 L61,156 L66,149 L72,147 L75,140 L68,133 L72,119 L66,107 L72,95 L68,83 L75,71 L82,65 Z"/>
+          <path class="coast" d="M88,60 L84,42 L88,48 L94,58 Q98,66 104,64 L112,68 L120,63 L130,69 L138,63 L148,68 L156,61 L164,54 L168,45 L172,38 L177,43 L179,34 L185,40 L191,35 L197,43 L203,37 L207,47 L215,45 L213,55 L221,57 L217,65 L225,67 L215,73 L219,79 L227,79 L231,87 L227,95 L235,101 L227,111 L231,123 L226,133 L229,141 L237,151 L242,159 L235,167 L231,177 L228,185 L226,190 C218,202 211,214 213,230 C214,244 219,252 223,262 C226,272 229,280 235,290 L243,299 L247,308 L240,315 L236,329 L241,341 L234,353 L240,363 L233,371 L239,381 L246,391 L240,398 L231,394 L227,388 Q216,394 208,389 L196,384 L184,389 L174,387 L164,395 L154,403 L147,413 L139,423 L131,419 L125,428 L117,431 L112,423 L105,416 L101,420 L98,410 L95,399 L100,389 L94,377 L99,365 L92,353 L87,343 L94,335 Q102,330 104,320 L99,308 L89,301 L84,307 L81,298 L87,291 L91,283 L82,277 L88,270 L84,257 L89,243 L83,229 L87,215 L80,201 L75,192 L81,184 L77,172 L83,163 L73,158 L66,163 L61,156 L66,149 L72,147 L75,140 L68,133 L72,119 L66,107 L72,95 L68,83 L75,71 L82,65 Z"/>
           <!-- islets -->
-          <path class="islet" d="M70,40 C74,32 84,28 90,32 C86,38 78,42 70,40 Z"/>
-          <circle class="islet" cx="218" cy="30" r="2.4"/><circle class="islet" cx="226" cy="35" r="2"/><circle class="islet" cx="211" cy="33" r="1.6"/>
-          <path class="islet" d="M86,438 C90,430 100,432 100,440 C96,448 88,446 86,438 Z"/>
+          <path class="islet" d="M62,38 C66,28 76,22 84,26 C80,34 70,40 62,38 Z"/>
+          <circle class="islet" cx="196" cy="26" r="2.4"/><circle class="islet" cx="204" cy="29" r="2"/><circle class="islet" cx="190" cy="29" r="1.6"/>
+          <path class="islet" d="M240,94 L250,89 L253,93 L243,97 Z"/>
+          <path class="islet" d="M92,428 C96,420 104,422 103,431 C99,438 92,436 92,428 Z"/>
+          <path class="islet" d="M76,412 C77,406 84,405 85,411 C84,416 77,417 76,412 Z"/>
           <!-- mountains: Supramonte & Gennargentu -->
           <g class="mtn">
             <path d="M186,206 l4,-7 l4,7"/><path d="M196,220 l4,-7 l4,7"/><path d="M178,228 l4,-7 l4,7"/>
@@ -372,26 +384,26 @@ li.done .mlab{color:var(--ink-soft)}
           </g>
           <!-- depth soundings -->
           <text class="depth" x="252" y="212">9</text><text class="depth" x="262" y="240">14</text>
-          <text class="depth" x="250" y="266">27</text><text class="depth" x="244" y="300">45</text>
-          <text class="depth" x="246" y="160">7</text>
+          <text class="depth" x="250" y="266">27</text><text class="depth" x="256" y="300">45</text>
+          <text class="depth" x="252" y="166">7</text>
           <!-- towns -->
           <g>
-            <circle class="town" cx="220" cy="140" r="1.8"/>
-            <path class="shipl" d="M215,131 h4 v-5 l-2,-2 l-2,2 Z"/>
-            <text class="tlab" x="228" y="137">Posada</text>
+            <circle class="town" cx="220" cy="135" r="1.8"/>
+            <path class="shipl" d="M216,127 h4 v-5 l-2,-2 l-2,2 Z"/>
+            <text class="tlab" x="236" y="134">Posada</text>
             <circle class="town" cx="172" cy="192" r="1.8"/><text class="tlab" x="134" y="189">Nuoro</text>
             <circle class="town" cx="186" cy="212" r="1.8"/><text class="tlab" x="148" y="216">Oliena</text>
             <circle class="town" cx="135" cy="240" r="1.8"/><text class="tlab" x="98" y="237">Sedilo</text>
-            <circle class="town" cx="162" cy="398" r="2.2"/><text class="tlab big" x="120" y="426">CAGLIARI</text>
+            <circle class="town" cx="172" cy="390" r="2.2"/><text class="tlab big" x="122" y="381">CAGLIARI</text>
           </g>
           <!-- Orosei: X marks the start -->
           <g>
-            <path class="xmark" d="M223,186 l11,11 M234,186 l-11,11"/>
-            <circle cx="228.5" cy="191.5" r="8.5" fill="none" stroke="#a4161a" stroke-width="1" stroke-dasharray="2 2.5"/>
-            <text class="olab" x="243" y="190">OROSEI</text>
-            <text class="start" x="243" y="201">· you start here ·</text>
+            <path class="xmark" d="M214.5,183.5 l11,11 M225.5,183.5 l-11,11"/>
+            <circle cx="220" cy="189" r="8.5" fill="none" stroke="#a4161a" stroke-width="1" stroke-dasharray="2 2.5"/>
+            <text class="olab" x="236" y="187">OROSEI</text>
+            <text class="start" x="236" y="198">· you start here ·</text>
           </g>
-          <text class="tlab" x="236" y="232" transform="rotate(72 236 232)" style="font-style:italic;fill:#8b7d61">G. di Orosei</text>
+          <text class="tlab" x="234" y="234" transform="rotate(78 234 234)" style="font-style:italic;fill:#8b7d61">G. di Orosei</text>
           <!-- sea creatures & craft -->
           <g class="serp">
             <path d="M295,96 c5,-12 17,-12 22,-1"/>
@@ -504,6 +516,7 @@ li.done .mlab{color:var(--ink-soft)}
 </button>
 
 <div class="zoomctl">
+  <button class="zbtn" id="zfs" aria-label="Full screen"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M3,8 V3 H8 M12,3 H17 V8 M17,12 V17 H12 M8,17 H3 V12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button class="zbtn" id="zin" aria-label="Zoom in">+</button>
   <button class="zbtn" id="zout" aria-label="Zoom out">−</button>
   <button class="zbtn" id="zfit" aria-label="Fit the whole map" style="font-size:12px">▣</button>
@@ -808,7 +821,18 @@ function modalTally(c){
   return h;
 }
 
+var WELCOME_KEY='sardegna-welcome-v1';
+function modalWelcome(){
+  return proseHtml([
+    'Benvenuta in Sardegna. Today you are not a tourist — you are a <b>princess-in-waiting</b>, and this chart is your one day to earn the crown. The island does not give crowns away; it gives them to those who come to know it — its people, its horses, its stiff laundry.',
+    'Every scroll on this map holds quests. Every quest pays points into the red wax seal in the corner. Points break the five seals of the <b>Main Quest</b>, one stranger at a time, until the island has no choice but to crown you.',
+    'You do not ride alone. With you goes your <b>trusted knight</b> — loyal, decorative, and unable to speak a single word of Italian. Ahead trots your squire, <b>Dodò the dog</b>, who speaks a bit more Italian than the knight and will open more doors. Choose your interpreter wisely.',
+    'Tap a scroll to unfurl it. Tap the seal to see the tally. Andiamo.'
+  ])+'<div class="resetwrap"><button type="button" class="beginbtn" data-act="begin">Begin the quest</button></div>';
+}
+function markWelcomed(){try{localStorage.setItem(WELCOME_KEY,'1');}catch(e){}}
 var MODALS={
+  welcome:{title:'Ciao, Alice!',sub:'a letter from the cartographer',render:modalWelcome},
   main:{title:'Know Your People',sub:'Main Qvest · the seven questions',render:modalMain},
   side:{title:'Act Like a Real Princess',sub:'Side Qvests · proofs, not activities',render:modalSide},
   bonus:{title:'The Royal Inventory',sub:'Bonvs Qvests · runs all day underneath everything',render:modalBonus},
@@ -823,7 +847,10 @@ function openModal(name){
   overlay.hidden=false;modalBody.scrollTop=0;
   document.getElementById('modalClose').focus({preventScroll:true});
 }
-function closeModal(){overlay.hidden=true;currentModal=null;resetArmed=false;}
+function closeModal(){
+  if(currentModal==='welcome')markWelcomed();
+  overlay.hidden=true;currentModal=null;resetArmed=false;
+}
 
 /* ————————————— render ————————————— */
 var prevStage=null,prevTotal=null;
@@ -855,11 +882,11 @@ function renderAll(){
   }
 }
 var toastTimer=null;
-function toast(msg){
+function toast(msg,ms){
   var el=document.getElementById('toast');
   el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){el.classList.remove('show');},2800);
+  toastTimer=setTimeout(function(){el.classList.remove('show');},ms||2800);
 }
 
 /* ————————————— mutations ————————————— */
@@ -874,6 +901,7 @@ modalBody.addEventListener('change',function(e){
 modalBody.addEventListener('click',function(e){
   var t=e.target.closest('[data-toggle],[data-step],[data-act]');
   if(!t)return;
+  if(t.dataset.act==='begin'){closeModal();return;}
   if(t.dataset.act==='reset'){
     if(!resetArmed){
       resetArmed=true;
@@ -882,7 +910,7 @@ modalBody.addEventListener('click',function(e){
       renderAll();
     }else{
       resetArmed=false;S=blank();
-      try{localStorage.removeItem(KEY);}catch(err){}
+      try{localStorage.removeItem(KEY);localStorage.removeItem(WELCOME_KEY);}catch(err){}
       prevStage=null;prevTotal=null;
       closeModal();renderAll();
       toast('The seal is broken. The quest begins anew.');
@@ -913,7 +941,7 @@ document.getElementById('tracker').addEventListener('click',function(){openModal
 /* ————————————— decorative svg bits built by loop ————————————— */
 (function(){
   var g=document.getElementById('rh'),h='';
-  var cx=737,cy=244;
+  var cx=728,cy=234;
   for(var i=0;i<32;i++){
     var a=i*Math.PI/16,x=cx+Math.cos(a)*1700,y=cy+Math.sin(a)*1700;
     h+='<line x1="'+cx+'" y1="'+cy+'" x2="'+x.toFixed(0)+'" y2="'+y.toFixed(0)+
@@ -969,6 +997,26 @@ vp.addEventListener('touchmove',function(e){
 },{passive:false});
 vp.addEventListener('touchend',function(){pinch=null;});
 
+/* fullscreen */
+var fsBtn=document.getElementById('zfs');
+var isStandalone=window.matchMedia&&matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+if(isStandalone)fsBtn.style.display='none';
+fsBtn.addEventListener('click',function(){
+  var el=document.documentElement;
+  if(document.fullscreenElement||document.webkitFullscreenElement){
+    (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+  }else if(el.requestFullscreen){
+    el.requestFullscreen({navigationUI:'hide'}).catch(function(){});
+  }else if(el.webkitRequestFullscreen){
+    el.webkitRequestFullscreen();
+  }else{
+    toast('On iPhone: tap Share, then “Add to Home Screen” — opened from there, the chart fills the whole screen.',6000);
+  }
+});
+['fullscreenchange','webkitfullscreenchange'].forEach(function(ev){
+  document.addEventListener(ev,function(){if(!userZoomed)fitZoom();});
+});
+
 /* rotate hint fades away on its own */
 setTimeout(function(){document.getElementById('rotHint').classList.remove('show');},7000);
 document.getElementById('rotHint').addEventListener('click',function(){this.classList.remove('show');});
@@ -977,6 +1025,7 @@ document.getElementById('rotHint').addEventListener('click',function(){this.clas
 renderAll();
 prevStage=compute().stage;prevTotal=compute().total;
 fitZoom();
+try{if(!localStorage.getItem(WELCOME_KEY))openModal('welcome');}catch(e){}
 </script>
 </body>
 </html>
