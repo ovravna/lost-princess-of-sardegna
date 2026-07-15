@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c1712">
+<title>The Lost Princess of Sardegna</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f5eed8'/%3E%3Crect x='6' width='4' height='16' fill='%23a4161a'/%3E%3Crect y='6' width='16' height='4' fill='%23a4161a'/%3E%3C/svg%3E">
+<style>
+/* ————— tokens ————— */
+:root{
+  --parch:#e9ddba;        /* sheet */
+  --parch-hi:#f5eed8;     /* panels, band */
+  --parch-lo:#d8c79c;     /* worn */
+  --parch-deep:#c2ae7c;   /* edges */
+  --ink:#221b11;          /* black, warm */
+  --ink-soft:#4d4433;
+  --faded:#8b7d61;        /* grey-brown of old ink */
+  --grey:#6e6a60;
+  --red:#a4161a;
+  --red-deep:#7a0e12;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{
+  background:#1c1712;
+  background-image:radial-gradient(120vmax 80vmax at 50% 40%, #2a2218 0%, #1c1712 60%, #120e0a 100%);
+  font-family:var(--serif);
+  color:var(--ink);
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+button{font-family:var(--serif);color:var(--ink);cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+/* ————— viewport / zoomable canvas ————— */
+.viewport{position:fixed;inset:0;overflow:auto;display:flex;-webkit-overflow-scrolling:touch}
+.canvas{margin:auto;flex:none;position:relative}
+.board{
+  position:absolute;left:0;top:0;width:1380px;height:660px;
+  transform-origin:0 0;
+  background:
+    radial-gradient(90% 120% at 53% 37%, #f0e6c6 0%, var(--parch) 45%, #e0d2a8 78%, var(--parch-lo) 100%);
+  border-radius:5px;
+  overflow:hidden;
+  box-shadow:
+    inset 0 0 90px rgba(96,72,32,.38),
+    inset 0 0 14px rgba(70,50,20,.35),
+    0 10px 40px rgba(0,0,0,.65), 0 2px 8px rgba(0,0,0,.5);
+  font-size:10px;
+  line-height:1.3;
+}
+/* deckled edge illusion */
+.board::before{content:"";position:absolute;inset:2px;border-radius:4px;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(60,42,16,.25), inset 0 0 26px rgba(86,62,26,.28)}
+
+/* ruled frame with corner devices */
+.frame{position:absolute;inset:11px;border:3px double rgba(34,27,17,.75);pointer-events:none;z-index:3}
+.frame i{position:absolute;width:9px;height:9px;background:var(--red);transform:rotate(45deg);box-shadow:0 0 0 2px var(--parch),0 0 0 3px rgba(34,27,17,.8)}
+.frame i:nth-child(1){left:-6px;top:-6px}.frame i:nth-child(2){right:-6px;top:-6px}
+.frame i:nth-child(3){left:-6px;bottom:-6px}.frame i:nth-child(4){right:-6px;bottom:-6px}
+
+/* stains & age */
+.stain{position:absolute;border-radius:50%;pointer-events:none;mix-blend-mode:multiply;z-index:2}
+.st1{width:150px;height:140px;left:474px;top:-24px;background:radial-gradient(closest-side,rgba(122,72,26,0) 55%,rgba(122,72,26,.10) 66%,rgba(96,56,18,.22) 71%,rgba(122,72,26,0) 76%)}
+.st2{width:110px;height:104px;left:498px;top:-6px;background:radial-gradient(closest-side,rgba(122,72,26,0) 52%,rgba(122,72,26,.14) 68%,rgba(122,72,26,0) 74%)}
+.st3{width:220px;height:200px;right:-40px;bottom:-42px;background:radial-gradient(closest-side,rgba(96,56,18,.10) 0%,rgba(96,56,18,.05) 40%,rgba(96,56,18,.16) 66%,rgba(96,56,18,0) 75%)}
+.st4{width:120px;height:120px;left:-24px;top:220px;background:radial-gradient(closest-side,rgba(122,72,26,0) 50%,rgba(122,72,26,.11) 64%,rgba(122,72,26,0) 72%)}
+.st5{width:70px;height:66px;left:340px;bottom:8px;background:radial-gradient(closest-side,rgba(96,56,18,.13) 30%,rgba(96,56,18,.05) 55%,rgba(96,56,18,0) 70%)}
+
+/* grain + weathering vignette centred on Orosei (737,244) */
+.grain{position:absolute;inset:0;z-index:14;pointer-events:none;opacity:.5;border-radius:5px}
+.vignette{position:absolute;inset:0;z-index:15;pointer-events:none;border-radius:5px;mix-blend-mode:multiply;
+  background:radial-gradient(1150px 760px at 737px 244px, rgba(255,250,235,0) 26%, rgba(140,110,55,.10) 55%, rgba(104,78,34,.22) 78%, rgba(70,50,20,.38) 100%)}
+
+/* rhumb lines svg spans whole board, beneath panels */
+.rhumbs{position:absolute;inset:0;z-index:1;pointer-events:none}
+
+/* ————— masthead ————— */
+.masthead{position:absolute;left:0;right:0;top:14px;height:78px;z-index:4;display:flex;align-items:center;justify-content:center;gap:16px;pointer-events:none}
+.crest{width:64px;height:70px;flex:none;filter:drop-shadow(1px 2px 1.5px rgba(40,25,8,.35))}
+.mast-mid{text-align:center}
+.eyebrow{font-size:9px;letter-spacing:.42em;color:var(--faded);text-transform:uppercase}
+h1{font-size:30px;font-weight:600;font-variant-caps:small-caps;letter-spacing:.14em;color:var(--ink);line-height:1.05;
+  text-shadow:1px 1px 0 rgba(164,22,26,.28)}
+h1 .amp{color:var(--red)}
+.mast-sub{font-size:10px;font-style:italic;color:var(--ink-soft);letter-spacing:.12em;margin-top:3px}
+.mast-rule{width:150px;height:12px;flex:none;color:rgba(34,27,17,.7)}
+
+/* ————— map ————— */
+.mapsvg{position:absolute;left:552px;top:86px;width:320px;height:367px;z-index:4;overflow:visible}
+
+/* ————— panels ————— */
+.panel{
+  position:absolute;z-index:5;text-align:left;
+  background:linear-gradient(160deg, rgba(247,240,220,.92), rgba(238,227,196,.88));
+  border:1px solid rgba(34,27,17,.85);
+  box-shadow:inset 0 0 0 3px rgba(247,240,220,.9), inset 0 0 0 4px rgba(34,27,17,.5), 1px 2px 6px rgba(60,40,14,.28);
+  padding:8px 10px 16px;
+  overflow:hidden;
+}
+.panel:active{filter:brightness(.97)}
+.p-main {left:18px;top:96px;width:522px;height:330px;transform:rotate(-.25deg)}
+.p-side {left:18px;top:436px;width:522px;height:206px;transform:rotate(.2deg)}
+.p-dip  {left:552px;top:459px;width:333px;height:183px;transform:rotate(-.2deg)}
+.p-dip .mini li{padding:.5px 0;line-height:1.15}
+.p-dip .mlab{font-size:8.5px}
+.p-dip .fl{font-size:8px;line-height:1;height:11px;display:inline-flex;align-items:center;overflow:hidden;letter-spacing:0;max-width:52px;white-space:nowrap}
+.p-dip .mchip{line-height:1.1}
+.p-dip .phead{margin-bottom:3px;padding-bottom:3px;white-space:nowrap}
+.p-dip .pname{font-size:12.5px}
+.p-dip{padding-bottom:8px}
+.p-bonus{left:898px;top:96px;width:464px;height:546px;transform:rotate(.15deg)}
+.p-main{background:linear-gradient(160deg, rgba(249,243,226,.96), rgba(240,229,199,.92));
+  box-shadow:inset 0 0 0 3px rgba(249,243,226,.9), inset 0 0 0 5px rgba(164,22,26,.55), 1px 3px 8px rgba(60,40,14,.35)}
+.phead{display:flex;align-items:baseline;gap:8px;border-bottom:1px solid rgba(34,27,17,.55);padding-bottom:4px;margin-bottom:5px}
+.pkicker{font-size:8px;letter-spacing:.34em;text-transform:uppercase;color:var(--faded)}
+.pname{font-variant-caps:small-caps;letter-spacing:.1em;font-weight:700;color:var(--red);font-size:15px}
+.p-main .pname{font-size:19px}
+.ppts{margin-left:auto;font-size:10px;color:var(--ink-soft);white-space:nowrap}
+.ppts b{color:var(--ink);font-size:13px}
+.pteaser{font-style:italic;color:var(--ink-soft);font-size:9.5px;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ptap{position:absolute;right:8px;bottom:3px;font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--faded)}
+
+/* mini lists on the board (read-only; tap panel to open) */
+.mini{list-style:none;pointer-events:none}
+.mini li{display:flex;align-items:baseline;gap:5px;padding:2.5px 0;border-bottom:1px dotted rgba(139,125,97,.5)}
+.mini li:last-child{border-bottom:0}
+.mbox{flex:none;width:11px;height:11px;border:1.2px solid var(--ink);background:rgba(255,252,240,.6);
+  font-size:11px;line-height:9px;text-align:center;color:var(--red);font-weight:700;transform:translateY(1px) rotate(-1deg)}
+.mlab{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);font-size:9.5px}
+.p-main .mlab{font-size:10.5px}
+.mnote{color:var(--faded);font-style:italic}
+.mpts{margin-left:auto;flex:none;color:var(--ink-soft);font-size:9px}
+.mpts b{color:var(--red)}
+.mchip{flex:none;font-size:7.5px;letter-spacing:.06em;border:1px solid rgba(77,68,51,.6);border-radius:2px;padding:0 3px;color:var(--faded)}
+.mchip.on{background:var(--red);border-color:var(--red-deep);color:var(--parch-hi)}
+.mstep{flex:none;font-size:8px;color:var(--ink-soft)}
+li.mlock .mlab{color:var(--faded);font-style:italic}
+.mseal{flex:none;width:15px;height:15px;border-radius:50% 46% 52% 48%;background:radial-gradient(circle at 35% 30%,#c03a34,var(--red) 55%,var(--red-deep));
+  color:var(--parch-hi);font-size:7px;line-height:15px;text-align:center;font-weight:700;box-shadow:0 1px 1px rgba(40,20,8,.4)}
+li.done .mlab{color:var(--ink-soft)}
+.tier{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);padding-top:4px}
+
+/* the gate — five wax seals */
+.gate{display:flex;align-items:center;gap:6px;margin:4px 0 6px}
+.gate small{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--faded);margin-right:2px}
+.gseal{width:24px;height:24px;border-radius:47% 53% 50% 50%/52% 48% 55% 45%;display:grid;place-items:center;
+  font-size:8px;font-weight:700;color:var(--faded);border:1.4px solid rgba(109,96,70,.8);background:rgba(255,252,240,.4);
+  box-shadow:inset 0 1px 2px rgba(60,40,14,.15)}
+.gseal.lit{color:var(--parch-hi);border-color:var(--red-deep);
+  background:radial-gradient(circle at 35% 28%,#cb4038,var(--red) 52%,var(--red-deep) 92%);
+  box-shadow:inset 0 1px 3px rgba(255,235,210,.4), inset 0 -3px 4px rgba(60,6,8,.5), 0 1px 2px rgba(40,20,8,.45)}
+.gseal.pop{animation:sealpop .5s ease}
+@keyframes sealpop{0%{transform:scale(.6)}55%{transform:scale(1.25)}100%{transform:scale(1)}}
+.gflav{font-size:8.5px;font-style:italic;color:var(--faded);margin-left:auto;max-width:210px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.modal-gate .gseal{width:34px;height:34px;font-size:11px}
+
+/* two-column list for the inventory panel */
+.p-bonus .mini{column-gap:14px}
+
+/* ————— fixed chrome ————— */
+.tracker{
+  position:fixed;right:calc(8px + env(safe-area-inset-right,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;width:82px;height:82px;border:0;
+  border-radius:46% 54% 52% 48%/55% 45% 54% 46%;
+  background:radial-gradient(circle at 34% 28%, #cf463c 0%, var(--red) 45%, var(--red-deep) 88%);
+  box-shadow:inset 0 2px 5px rgba(255,235,210,.45), inset 0 -8px 12px rgba(50,4,6,.55), 0 5px 14px rgba(0,0,0,.55);
+  color:var(--parch-hi);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+}
+.tracker::before{content:"";position:absolute;width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(245,238,216,.5);pointer-events:none}
+.tracker::after{content:"";position:absolute;right:8px;bottom:-7px;width:16px;height:14px;
+  background:radial-gradient(circle at 40% 20%, var(--red) 30%, var(--red-deep));border-radius:40% 60% 55% 45%/30% 30% 70% 70%;z-index:-1}
+.t-num{font-size:26px;font-weight:700;line-height:1;text-shadow:0 -1px 0 rgba(60,6,8,.8),0 1px 1px rgba(255,240,220,.35)}
+.t-lab{font-size:7.5px;letter-spacing:.34em;text-transform:uppercase;opacity:.85;margin-top:2px}
+.tracker.tick{animation:ttick .35s ease}
+@keyframes ttick{40%{transform:scale(1.12) rotate(-2deg)}}
+
+.zoomctl{position:fixed;left:calc(3px + env(safe-area-inset-left,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;gap:6px}
+.zbtn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);font-size:15px;line-height:1;opacity:.92;
+  background:radial-gradient(circle at 35% 30%, var(--parch-hi), var(--parch) 70%, var(--parch-lo));
+  box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.5);color:var(--ink)}
+.zbtn:active{transform:scale(.93)}
+
+.rotate-hint{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:70;display:none;align-items:center;gap:7px;
+  background:linear-gradient(var(--parch-hi),var(--parch));border:1px solid var(--ink);border-radius:3px;
+  padding:5px 11px;font-size:11px;font-style:italic;color:var(--ink-soft);box-shadow:0 3px 10px rgba(0,0,0,.5)}
+@media (orientation:portrait){.rotate-hint.show{display:flex}}
+.rotate-hint svg{width:15px;height:15px;flex:none}
+
+.toast{position:fixed;left:50%;bottom:16px;transform:translate(-50%,80px);z-index:80;opacity:0;pointer-events:none;
+  background:linear-gradient(var(--parch-hi),var(--parch));border:1px solid var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.55), inset 0 0 0 3px rgba(247,240,220,.9), inset 0 0 0 4px rgba(164,22,26,.5);
+  padding:7px 16px;font-size:12px;font-style:italic;color:var(--ink);max-width:78vw;text-align:center;
+  transition:transform .35s ease,opacity .35s ease}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
+/* ————— modal scroll ————— */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(18,12,6,.62);display:flex;align-items:center;justify-content:center;padding:16px 12px}
+.overlay[hidden]{display:none}
+.scroll{position:relative;width:min(94vw,720px);max-height:calc(100dvh - 34px);display:flex;flex-direction:column;
+  background:
+    linear-gradient(90deg, rgba(120,90,40,.20) 0%, rgba(120,90,40,0) 3%, rgba(120,90,40,0) 97%, rgba(120,90,40,.20) 100%),
+    radial-gradient(120% 100% at 50% 30%, #f6efd9 0%, #ecdfbc 70%, #e0cfa2 100%);
+  border:1px solid var(--ink);box-shadow:0 14px 44px rgba(0,0,0,.7);
+  transform-origin:50% 0;animation:unfurl .22s ease-out}
+@keyframes unfurl{from{transform:scaleY(.5);opacity:0}to{transform:scaleY(1);opacity:1}}
+.scroll::before,.scroll::after{content:"";position:absolute;left:-13px;right:-13px;height:22px;border-radius:11px;
+  background:linear-gradient(#b89a62, #8a6c38 45%, #5e461f);box-shadow:0 3px 7px rgba(0,0,0,.55);z-index:2}
+.scroll::before{top:-11px}.scroll::after{bottom:-11px}
+.scroll-head{display:flex;align-items:center;gap:10px;padding:16px 16px 8px;border-bottom:2px solid rgba(164,22,26,.5);flex:none}
+.scroll-head .crest{width:34px;height:38px}
+.scroll-head h2{font-variant-caps:small-caps;letter-spacing:.12em;color:var(--red);font-size:20px;font-weight:700;line-height:1.1}
+.scroll-head .sub{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--faded)}
+.mclose{margin-left:auto;flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;font-size:16px}
+.scroll-body{overflow-y:auto;padding:10px 16px 20px;font-size:13.5px;-webkit-overflow-scrolling:touch}
+
+.prose{font-style:italic;color:var(--ink-soft);font-size:12.5px;margin:8px 0 10px}
+.prose p{margin:0 0 7px}
+.prose p:first-child::first-letter{initial-letter:2;-webkit-initial-letter:2;color:var(--red);font-style:normal;font-weight:700;padding-right:5px}
+.smallprint{border-top:1px dotted rgba(139,125,97,.8);margin-top:12px;padding-top:8px;font-size:11px;font-style:italic;color:var(--faded)}
+.smallprint p{margin:0 0 6px}
+.gnote{font-size:11px;font-style:italic;color:var(--ink-soft);background:rgba(164,22,26,.06);border:1px dashed rgba(164,22,26,.45);padding:6px 9px;margin:8px 0}
+
+.qrow{display:flex;gap:9px;align-items:flex-start;padding:9px 2px;border-bottom:1px dotted rgba(139,125,97,.7)}
+.qrow:last-of-type{border-bottom:0}
+.qrow.done{background:rgba(164,22,26,.045)}
+.qnum{flex:none;width:24px;font-size:13px;color:var(--red);font-weight:700;text-align:center;padding-top:2px;font-variant-caps:small-caps}
+.ck{flex:none;position:relative;width:26px;height:26px;display:block}
+.ck input{position:absolute;inset:-8px;width:auto;height:auto;opacity:0}
+.fauxbox{position:absolute;inset:0;border:1.7px solid var(--ink);background:rgba(255,252,242,.75);transform:rotate(-1.2deg);
+  box-shadow:1px 1px 0 rgba(60,40,14,.2)}
+.ck input:checked + .fauxbox::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;
+  color:var(--red);font-size:24px;font-weight:700;transform:rotate(3deg);text-shadow:1px 1px 0 rgba(122,14,18,.3)}
+.ck input:focus-visible + .fauxbox{outline:2px solid var(--red);outline-offset:2px}
+.qbody{min-width:0;flex:1}
+.qtext{color:var(--ink);line-height:1.35}
+.qtext .pv{color:var(--red);font-size:11px;border:1px solid rgba(164,22,26,.55);border-radius:2px;padding:0 4px;margin-left:5px;white-space:nowrap}
+.qnote{font-size:11px;font-style:italic;color:var(--faded);margin-top:3px}
+.extras{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.chip{border:1.4px solid var(--ink-soft);border-radius:2px;background:rgba(255,252,242,.6);
+  font-size:11px;letter-spacing:.04em;padding:4px 9px;font-variant-caps:small-caps;color:var(--ink-soft)}
+.chip.on{background:radial-gradient(circle at 35% 28%,#c03a34,var(--red) 60%,var(--red-deep));border-color:var(--red-deep);
+  color:var(--parch-hi);transform:rotate(-.8deg);box-shadow:inset 0 -2px 3px rgba(50,4,6,.5)}
+.stepper{display:inline-flex;align-items:center;gap:0;border:1.4px solid var(--ink-soft);border-radius:2px;background:rgba(255,252,242,.6)}
+.stepper button{width:30px;height:28px;border:0;background:transparent;font-size:16px;line-height:1}
+.stepper .sval{min-width:44px;text-align:center;font-size:12px;border-left:1px dotted var(--faded);border-right:1px dotted var(--faded);padding:0 4px;color:var(--red);font-weight:700}
+.steplab{font-size:10.5px;font-style:italic;color:var(--faded)}
+.qrow.locked{align-items:center;background:repeating-linear-gradient(-45deg, rgba(139,125,97,.07) 0 6px, rgba(139,125,97,0) 6px 12px)}
+.sealio{flex:none;width:26px;height:26px;border-radius:47% 53% 50% 50%/52% 48% 55% 45%;
+  background:radial-gradient(circle at 35% 30%,#c03a34,var(--red) 55%,var(--red-deep));color:var(--parch-hi);
+  display:grid;place-items:center;font-size:9px;font-weight:700;box-shadow:0 1px 2px rgba(40,20,8,.5)}
+.lockt{color:var(--faded);font-style:italic}
+.fl{font-size:13px;letter-spacing:1px;flex:none}
+.flmoor{width:16px;height:16px;flex:none;vertical-align:-3px}
+.neg .qtext .pv{background:rgba(164,22,26,.12)}
+
+.tally{width:100%;border-collapse:collapse;margin:6px 0 12px}
+.tally td{padding:6px 4px;border-bottom:1px dotted rgba(139,125,97,.7);font-size:13px}
+.tally td:last-child{text-align:right;font-weight:700}
+.tally tr.tot td{border-top:2px solid var(--red);border-bottom:0;font-size:16px;color:var(--red)}
+.resetwrap{text-align:center;margin-top:14px}
+.resetseal{border:1.4px dashed var(--red);background:transparent;color:var(--red);font-variant-caps:small-caps;
+  letter-spacing:.08em;font-size:13px;padding:8px 16px;border-radius:3px}
+.resetseal.armed{background:var(--red);color:var(--parch-hi);border-style:solid;animation:ttick .4s ease}
+.resethint{font-size:10px;font-style:italic;color:var(--faded);margin-top:6px}
+
+/* map svg text/marks */
+.mapsvg text{font-family:var(--serif)}
+.coast{fill:rgba(245,238,216,.5);stroke:var(--ink);stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.coast2{fill:none;stroke:var(--faded);stroke-width:4.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1 6;opacity:.55}
+.islet{fill:rgba(245,238,216,.5);stroke:var(--ink);stroke-width:1.3;stroke-linejoin:round}
+.mtn{fill:none;stroke:var(--ink-soft);stroke-width:1.1;stroke-linecap:round;opacity:.8}
+.town{fill:var(--ink)}
+.tlab{font-size:8.5px;fill:var(--ink-soft);letter-spacing:.05em}
+.tlab.big{font-size:9.5px;letter-spacing:.14em;fill:var(--ink)}
+.sealab{font-size:9px;fill:var(--faded);letter-spacing:.5em;font-style:italic}
+.joke{font-size:7.5px;fill:var(--faded);letter-spacing:.2em;font-style:italic}
+.depth{font-size:6.5px;fill:var(--faded);font-style:italic}
+.xmark{stroke:var(--red);stroke-width:3;stroke-linecap:round}
+.olab{font-size:11px;fill:var(--red);font-weight:700;letter-spacing:.18em}
+.start{font-size:8px;fill:var(--ink-soft);font-style:italic}
+.serp{fill:none;stroke:var(--ink-soft);stroke-width:2.2;stroke-linecap:round}
+.shipl{fill:none;stroke:var(--ink-soft);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.compass line{stroke:var(--ink-soft);stroke-width:.8}
+.scalebar{stroke:var(--ink-soft);stroke-width:1}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- shared defs: the Moor of the four-moors flag -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="moorU" viewBox="0 0 100 100">
+      <path fill="#221b11" d="M47,10 C61,6 73,14 76,26 C77,30 80,34 83,38 C85,41 82,42.5 79,42.5 C80,45.5 82,48 80,50 C78,52 76,51 75,52 C77,55 76.5,58 73,60 C70,62 66,61 64,63 C64,68 65.5,74 62,79 L63,91 C54,95 42,95 34,91 L36,74 C27,67 21,55 23,41 C25,24 33,14 47,10 Z"/>
+      <path fill="#f5eed8" stroke="#221b11" stroke-width="2" stroke-linejoin="round" d="M25,41 C38,26 60,20 78,29 L74.5,40 C58,32.5 40,36 29.5,50 Z"/>
+      <path fill="#f5eed8" stroke="#221b11" stroke-width="1.6" stroke-linejoin="round" d="M26,42 L11,34 L18,47 Z"/>
+      <path fill="#f5eed8" stroke="#221b11" stroke-width="1.6" stroke-linejoin="round" d="M26,45 L9,47 L20,54 Z"/>
+    </symbol>
+    <symbol id="crestU" viewBox="0 0 120 134">
+      <clipPath id="shieldClip"><path d="M12,10 H108 V58 C108,90 87,110 60,124 C33,110 12,90 12,58 Z"/></clipPath>
+      <path d="M12,10 H108 V58 C108,90 87,110 60,124 C33,110 12,90 12,58 Z" fill="#f5eed8"/>
+      <g clip-path="url(#shieldClip)">
+        <rect x="52" y="0" width="16" height="134" fill="#a4161a"/>
+        <rect x="0" y="54" width="120" height="16" fill="#a4161a"/>
+        <use href="#moorU" x="16" y="16" width="32" height="32"/>
+        <use href="#moorU" x="72" y="16" width="32" height="32"/>
+        <use href="#moorU" x="18" y="70" width="32" height="32"/>
+        <use href="#moorU" x="70" y="70" width="32" height="32"/>
+      </g>
+      <path d="M12,10 H108 V58 C108,90 87,110 60,124 C33,110 12,90 12,58 Z" fill="none" stroke="#221b11" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M8,6 H112" stroke="#221b11" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="viewport" id="vp">
+  <div class="canvas" id="canvas">
+    <div class="board" id="board">
+
+      <!-- rhumb lines: every bearing runs from Orosei -->
+      <svg class="rhumbs" viewBox="0 0 1380 660" preserveAspectRatio="none" aria-hidden="true">
+        <g id="rh"></g>
+      </svg>
+
+      <div class="stain st1"></div><div class="stain st2"></div><div class="stain st3"></div>
+      <div class="stain st4"></div><div class="stain st5"></div>
+
+      <header class="masthead">
+        <svg class="mast-rule" viewBox="0 0 150 12" aria-hidden="true">
+          <path d="M4,6 H132 M138,6 l5,-3 v6 Z" stroke="currentColor" fill="currentColor" stroke-width="1.2"/>
+          <circle cx="4" cy="6" r="2.4" fill="#a4161a"/>
+        </svg>
+        <svg class="crest" aria-label="The Four Moors of Sardegna"><use href="#crestU"/></svg>
+        <div class="mast-mid">
+          <div class="eyebrow">Chart of one day’s reign · drawn at Orosei · A.D. MMXXVI</div>
+          <h1>The Lost Princess <span class="amp">of</span> Sardegna</h1>
+          <div class="mast-sub">furat chi benit dae su mare — he who comes from the sea, steals</div>
+        </div>
+        <svg class="mast-rule" viewBox="0 0 150 12" style="transform:scaleX(-1)" aria-hidden="true">
+          <path d="M4,6 H132 M138,6 l5,-3 v6 Z" stroke="currentColor" fill="currentColor" stroke-width="1.2"/>
+          <circle cx="4" cy="6" r="2.4" fill="#a4161a"/>
+        </svg>
+      </header>
+
+      <!-- the island -->
+      <svg class="mapsvg" viewBox="0 0 410 470" aria-label="Old sailor’s map of Sardegna">
+        <defs>
+          <radialGradient id="oroFade" gradientUnits="userSpaceOnUse" cx="228" cy="192" r="300">
+            <stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff"/>
+            <stop offset=".75" stop-color="#9a9a9a"/><stop offset="1" stop-color="#5c5c5c"/>
+          </radialGradient>
+          <mask id="oroMask"><rect x="-40" y="-40" width="490" height="550" fill="url(#oroFade)"/></mask>
+        </defs>
+        <g mask="url(#oroMask)">
+          <!-- coast shading then coastline -->
+          <path class="coast2" d="M96,54 L92,40 L100,46 C108,38 118,34 128,40 C140,34 150,40 158,34 C170,28 182,34 190,30 C200,26 210,32 214,42 C210,50 216,54 212,62 C222,66 220,76 216,84 C222,94 224,106 220,116 C226,124 222,134 224,142 C228,152 226,164 230,172 C232,180 228,186 231,193 C224,204 219,214 222,228 C228,238 226,248 232,256 C238,266 234,272 240,278 C236,292 240,304 234,316 C238,330 232,344 236,356 C230,370 234,382 226,392 C220,402 210,404 204,412 C194,402 186,398 178,402 C170,406 164,402 156,408 C146,414 140,422 132,418 C122,426 112,432 104,424 C96,434 90,426 92,416 C86,404 90,392 84,380 C88,366 82,352 86,340 C80,326 84,314 78,302 C88,296 92,288 86,280 C78,272 72,264 78,256 C74,244 78,230 72,218 C76,206 70,194 74,182 C68,170 72,158 66,146 C60,136 66,124 62,112 L54,108 L62,104 C64,92 70,82 68,72 C74,64 82,60 88,58 C90,56 94,56 96,54 Z"/>
+          <path class="coast" d="M96,54 L92,40 L100,46 C108,38 118,34 128,40 C140,34 150,40 158,34 C170,28 182,34 190,30 C200,26 210,32 214,42 C210,50 216,54 212,62 C222,66 220,76 216,84 C222,94 224,106 220,116 C226,124 222,134 224,142 C228,152 226,164 230,172 C232,180 228,186 231,193 C224,204 219,214 222,228 C228,238 226,248 232,256 C238,266 234,272 240,278 C236,292 240,304 234,316 C238,330 232,344 236,356 C230,370 234,382 226,392 C220,402 210,404 204,412 C194,402 186,398 178,402 C170,406 164,402 156,408 C146,414 140,422 132,418 C122,426 112,432 104,424 C96,434 90,426 92,416 C86,404 90,392 84,380 C88,366 82,352 86,340 C80,326 84,314 78,302 C88,296 92,288 86,280 C78,272 72,264 78,256 C74,244 78,230 72,218 C76,206 70,194 74,182 C68,170 72,158 66,146 C60,136 66,124 62,112 L54,108 L62,104 C64,92 70,82 68,72 C74,64 82,60 88,58 C90,56 94,56 96,54 Z"/>
+          <!-- islets -->
+          <path class="islet" d="M70,40 C74,32 84,28 90,32 C86,38 78,42 70,40 Z"/>
+          <circle class="islet" cx="218" cy="30" r="2.4"/><circle class="islet" cx="226" cy="35" r="2"/><circle class="islet" cx="211" cy="33" r="1.6"/>
+          <path class="islet" d="M86,438 C90,430 100,432 100,440 C96,448 88,446 86,438 Z"/>
+          <!-- mountains: Supramonte & Gennargentu -->
+          <g class="mtn">
+            <path d="M186,206 l4,-7 l4,7"/><path d="M196,220 l4,-7 l4,7"/><path d="M178,228 l4,-7 l4,7"/>
+            <path d="M190,244 l4,-7 l4,7"/><path d="M176,258 l4,-7 l4,7"/><path d="M198,262 l4,-7 l4,7"/>
+            <path d="M208,120 l3.5,-6 l3.5,6"/><path d="M198,132 l3.5,-6 l3.5,6"/>
+          </g>
+          <!-- depth soundings -->
+          <text class="depth" x="252" y="212">9</text><text class="depth" x="262" y="240">14</text>
+          <text class="depth" x="250" y="266">27</text><text class="depth" x="244" y="300">45</text>
+          <text class="depth" x="246" y="160">7</text>
+          <!-- towns -->
+          <g>
+            <circle class="town" cx="220" cy="140" r="1.8"/>
+            <path class="shipl" d="M215,131 h4 v-5 l-2,-2 l-2,2 Z"/>
+            <text class="tlab" x="228" y="137">Posada</text>
+            <circle class="town" cx="172" cy="192" r="1.8"/><text class="tlab" x="134" y="189">Nuoro</text>
+            <circle class="town" cx="186" cy="212" r="1.8"/><text class="tlab" x="148" y="216">Oliena</text>
+            <circle class="town" cx="135" cy="240" r="1.8"/><text class="tlab" x="98" y="237">Sedilo</text>
+            <circle class="town" cx="162" cy="398" r="2.2"/><text class="tlab big" x="120" y="426">CAGLIARI</text>
+          </g>
+          <!-- Orosei: X marks the start -->
+          <g>
+            <path class="xmark" d="M223,186 l11,11 M234,186 l-11,11"/>
+            <circle cx="228.5" cy="191.5" r="8.5" fill="none" stroke="#a4161a" stroke-width="1" stroke-dasharray="2 2.5"/>
+            <text class="olab" x="243" y="190">OROSEI</text>
+            <text class="start" x="243" y="201">· you start here ·</text>
+          </g>
+          <text class="tlab" x="236" y="232" transform="rotate(72 236 232)" style="font-style:italic;fill:#8b7d61">G. di Orosei</text>
+          <!-- sea creatures & craft -->
+          <g class="serp">
+            <path d="M295,96 c5,-12 17,-12 22,-1"/>
+            <path d="M323,97 c5,-10 15,-10 19,0"/>
+            <path d="M347,98 c4,-8 11,-7 14,0"/>
+            <path d="M290,99 l-7,-8 m7,8 l-9,1" stroke-width="1.6"/>
+          </g>
+          <circle cx="292" cy="88" r="1.2" fill="#4d4433"/>
+          <text class="joke" x="296" y="116">hic svnt leones</text>
+          <g class="shipl">
+            <path d="M316,346 C320,353 340,353 345,346 L340,343 L321,343 Z" fill="rgba(245,238,216,.5)"/>
+            <path d="M327,343 V323 M336,343 V329"/>
+            <path d="M327,325 L340,341 L327,341 Z" fill="rgba(245,238,216,.6)"/>
+            <path d="M336,330 L343,340 L336,340 Z" fill="rgba(245,238,216,.6)"/>
+            <path d="M327,323 l6,2 l-6,2" fill="none" stroke="#a4161a"/>
+            <path d="M306,352 q6,4 12,0 M340,353 q6,4 12,0"/>
+          </g>
+          <!-- sea names -->
+          <text class="sealab" x="368" y="150" transform="rotate(90 368 150)">MARE TYRRHENVM</text>
+          <text class="sealab" x="34" y="330" transform="rotate(-90 34 330)">MARE SARDVM</text>
+          <!-- compass rose, SW sea -->
+          <g class="compass" transform="translate(46,424)">
+            <circle r="24" fill="none" stroke="#4d4433" stroke-width="1"/>
+            <circle r="19" fill="none" stroke="#8b7d61" stroke-width=".6"/>
+            <g id="cr8"></g>
+            <path d="M0,-22 L4,-4 L0,0 L-4,-4 Z" fill="#a4161a" stroke="#221b11" stroke-width=".7"/>
+            <path d="M0,22 L4,4 L0,0 L-4,4 Z" fill="#f5eed8" stroke="#221b11" stroke-width=".7"/>
+            <path d="M-22,0 L-4,-4 L0,0 L-4,4 Z" fill="#f5eed8" stroke="#221b11" stroke-width=".7"/>
+            <path d="M22,0 L4,-4 L0,0 L4,4 Z" fill="#f5eed8" stroke="#221b11" stroke-width=".7"/>
+            <text x="-3.5" y="-27" style="font-size:9px;fill:#a4161a;font-weight:700">N</text>
+          </g>
+          <!-- scale bar -->
+          <g class="scalebar" transform="translate(118,458)">
+            <path d="M0,0 H90 M0,-3 V3 M30,-3 V3 M60,-3 V3 M90,-3 V3"/>
+            <text class="depth" x="18" y="-6">X</text><text class="depth" x="48" y="-6">XX</text><text class="depth" x="76" y="-6">XXX</text>
+            <text class="depth" x="18" y="12" style="letter-spacing:.18em">LEGHE SARDE</text>
+          </g>
+        </g>
+      </svg>
+
+      <!-- MAIN QUEST -->
+      <section class="panel p-main" id="panel-main" role="button" tabindex="0" aria-label="Main quest — open the scroll">
+        <div class="phead">
+          <span class="pkicker">Main Qvest</span>
+          <span class="pname">Know Your People</span>
+          <span class="ppts"><b id="pv-main">0</b> / 67 pts</span>
+        </div>
+        <div class="pteaser">A crown is not a thing you are given, it is a thing you earn by knowing. Seven questions, seven strangers, a kilometre apart — and a gift bought in the village before.</div>
+        <div class="gate" id="gate-main"></div>
+        <ol class="mini" id="mini-main"></ol>
+        <span class="ptap">tap to unfurl</span>
+      </section>
+
+      <!-- SIDE QUESTS -->
+      <section class="panel p-side" id="panel-side" role="button" tabindex="0" aria-label="Side quests — open the scroll">
+        <div class="phead">
+          <span class="pkicker">Side Qvests</span>
+          <span class="pname">Act Like a Real Princess</span>
+          <span class="ppts"><b id="pv-side">0</b> / 41 pts</span>
+        </div>
+        <ul class="mini" id="mini-side"></ul>
+        <span class="ptap">tap to unfurl</span>
+      </section>
+
+      <!-- DIPLOMACY -->
+      <section class="panel p-dip" id="panel-dip" role="button" tabindex="0" aria-label="Diplomacy — open the scroll">
+        <div class="phead">
+          <span class="pkicker">Diplomacy</span>
+          <span class="pname">Foreign Relations</span>
+          <span class="ppts"><b id="pv-dip">0</b> / 56 pts</span>
+        </div>
+        <ul class="mini" id="mini-dip"></ul>
+        <span class="ptap">tap to unfurl</span>
+      </section>
+
+      <!-- BONUS -->
+      <section class="panel p-bonus" id="panel-bonus" role="button" tabindex="0" aria-label="Bonus quests, the Royal Inventory — open the scroll">
+        <div class="phead">
+          <span class="pkicker">Bonvs Qvests</span>
+          <span class="pname">The Royal Inventory</span>
+          <span class="ppts"><b id="pv-bonus">0</b> / 35 pts</span>
+        </div>
+        <ul class="mini" id="mini-bonus"></ul>
+        <span class="ptap">tap to unfurl</span>
+      </section>
+
+      <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+      <svg class="grain" aria-hidden="true">
+        <filter id="paperGrain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="7" stitchTiles="stitch"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0.24  0 0 0 0 0.18  0 0 0 0 0.08  0.35 0.35 0.35 0 0"/>
+        </filter>
+        <filter id="paperMottle">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="11" stitchTiles="stitch"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.30  0 0 0 0 0.12  0.5 0.5 0.5 0 0"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#paperMottle)" opacity=".16"/>
+        <rect width="100%" height="100%" filter="url(#paperGrain)" opacity=".13"/>
+      </svg>
+      <div class="vignette" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<!-- fixed chrome -->
+<button class="tracker" id="tracker" aria-label="Open the tally">
+  <span class="t-num" id="tnum">0</span>
+  <span class="t-lab">pvntos</span>
+</button>
+
+<div class="zoomctl">
+  <button class="zbtn" id="zin" aria-label="Zoom in">+</button>
+  <button class="zbtn" id="zout" aria-label="Zoom out">−</button>
+  <button class="zbtn" id="zfit" aria-label="Fit the whole map" style="font-size:12px">▣</button>
+</div>
+
+<div class="rotate-hint show" id="rotHint" role="status">
+  <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6" y="2" width="8" height="14" rx="2" fill="none" stroke="#221b11" stroke-width="1.5"/><path d="M3,19 a9,9 0 0 0 14,0 M17,19 v-3.4 M17,19 h-3.4" fill="none" stroke="#a4161a" stroke-width="1.5"/></svg>
+  rotate for the full map
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="scroll" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="scroll-head">
+      <svg class="crest" aria-hidden="true"><use href="#crestU"/></svg>
+      <div><h2 id="modalTitle"></h2><div class="sub" id="modalSub"></div></div>
+      <button class="mclose" id="modalClose" aria-label="Roll the scroll closed">✕</button>
+    </div>
+    <div class="scroll-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ————————————— data ————————————— */
+var KEY='sardegna-quest-v1';
+var THR=[0,15,30,45,60];
+var ROMAN=['I','II','III','IV','V','VI','VII'];
+
+var MAINQ=[
+  {id:'m1',pts:5,stage:0,q:'If you were in charge here, what would you change?'},
+  {id:'m2',pts:5,stage:0,q:'Do you feel more Sardinian or Italian?'},
+  {id:'m3',pts:5,stage:1,q:'Why did you stay? / Why did you come back?'},
+  {id:'m4',pts:5,stage:1,q:'Did your mother speak Sardinian to you? Do you — would you — speak it to your children?'},
+  {id:'m5',pts:4,stage:2,q:'Why do people live so long here?'},
+  {id:'m6',pts:4,stage:3,q:'Who was Eleonora d’Arborea?'},
+  {id:'m7',pts:4,stage:4,q:'Who were the four moors on the flag? Were they blindfolded?'}
+];
+var MAIN_INTRO=[
+  'A crown is not a thing you are given, it is a thing you earn by knowing. You have arrived in a kingdom that has never truly been conquered — only visited, taxed, and misunderstood, always by people who came from the sea. There is a saying here: <b>furat chi benit dae su mare</b> — he who comes from the sea, steals. It is why every old village turns its back on the coast. You have one day to stop being one of them.',
+  'Seven questions. Each asked of a different person, at least 1 km apart. You must be introduced — ideally by the person before. You arrive with a gift, bought in the previous person’s village before you left it. You never dial the phone; if a call is made ahead of you, they make it. And when an answer runs dry, you ask the only question that keeps the chain alive: <b>“Who knows more about this than you?”</b>'
+];
+var MAIN_GATE='The gate: 0 · 15 · 30 · 45 · 60 — you cannot move to the next person until you have banked 15 points from the one in front of you. An introduction plus two questions clears it; anything less and you haven’t met them, you’ve interviewed them. No skipping ahead to easier company.';
+var MAIN_TIPS='Ask 2 anywhere and listen for the tell instead: people here say they are going to Italy when they take the ferry. Ask 4 of someone who winces — their generation was told the language would hold their children back at school. Ask 6 of anyone; ask 7 of two people and watch them disagree, because the flag was officially changed in 1999 and not everyone has forgiven it.';
+
+var SIDE_INTRO='Anyone can learn a realm. A sovereign must also be seen in it — on a horse, on the water, in the right clothes, with the right drink in her hand. These are not activities. They are proofs. Nothing counts if you paid for it and demanded it. Everything doubles if someone simply decided you should have it.';
+var SIDEQ=[
+  {id:'castle',base:2,label:'Build a sand castle',extra:{kind:'step',max:5,lab:'style — awarded by your knight, no appeals'},
+   note:'Do it in sight of Castello della Fava at Posada, 40 minutes north. A real castle, on a real rock. Yours will be worse.'},
+  {id:'horse',base:3,label:'Ride a horse',extra:{kind:'tog',pts:5,lab:'+5 offered freely'},
+   note:'This island has more horses per head than anywhere else in Italy. At Sedilo they race them downhill at a stone arch every July and people are genuinely hurt.'},
+  {id:'sail',base:3,label:'Sail on a ship',extra:{kind:'tog',pts:5,lab:'+5 offered freely'},
+   note:'Any hull, any length of time, but you hold the tiller.'},
+  {id:'spirit',base:3,label:'Try local home made spirit',extra:{kind:'tog',pts:5,lab:'+5 offered freely'},
+   note:'Fil’e ferru — “iron wire.” When distilling was taxed, they buried the bottles and left a wire poking out to find them again. The name is a confession.'},
+  {id:'dress',base:5,label:'Wear a dress from Sardegna',extra:{kind:'tog',pts:5,lab:'+5 the knight likes it'},
+   note:'His vote, and he pays. Every village has its own, down to the stitch — a Sardinian can read where a woman is from across a piazza. They come out for festas and funerals, and on 1 May in Cagliari, all of them at once.'}
+];
+
+var BONUS_INTRO='No one rules what they have not looked at. A kingdom is not its monuments — it is the caps, the dogs, the stiff laundry, the dying cars. The Inventory runs all day underneath everything else. First to claim it owns it; nobody claims the same thing twice. Anything engineered on purpose is void — it has to arise. Anything the other cannot verify with their own eyes is void. One veto each per day: either of you may kill a claim as cheap, and cheap means you both knew it was there before you saw it.';
+var BONUSQ=[
+  {id:'b1',pts:1,label:'Laundry left out so long it’s gone stiff'},
+  {id:'b2',pts:1,label:'A bar sign hand-painted and never repainted'},
+  {id:'b3',pts:1,label:'Something made of marble that has no business being marble',
+   note:'Orosei sits on a marble seam shipped all over the world. The kerbs are offcuts. People rest beer on stone that would be a hotel lobby in Dubai.'},
+  {id:'b4',pts:1,label:'An old man on a bench',
+   note:'The bench is an institution with rules. Same men, same order, same hour. Nobody’s wife is on it.'},
+  {id:'b5',pts:1,label:'Get someone to hum or sing a few bars of anything',
+   note:'Cantu a tenore is four voices, and two of them are animals — the bassu is an ox, the contra a sheep. One man cannot do it alone. He will try anyway, then start phoning people.'},
+  {id:'b6',pts:2,label:'A road sign with the town name in Sardinian under the Italian, inland only',
+   note:'Ulìana for Oliena. Nùgoro for Nuoro. The coast doesn’t bother.'},
+  {id:'b7',pts:2,label:'A road sign with bullet holes in it',
+   note:'Boar hunters. Nobody replaces the sign.'},
+  {id:'b8',pts:2,label:'Livestock stopping you completely — not beside the road, stopping you',
+   note:'The flock has the right of way and knows it. So does the man behind it, who will not hurry.'},
+  {id:'b9',pts:2,label:'A cork oak stripped to the red',
+   note:'Stripped once every nine years and painted with the year it was done, so you can read the tree like a receipt. The bare trunk looks skinned.'},
+  {id:'b10',pts:2,label:'A roadside shrine for someone who died on that curve',
+   note:'Fresh flowers mean somebody still drives that road every week.'},
+  {id:'b11',pts:2,label:'A coffee under €1.20, inland bars only, no chance on the coast',
+   note:'Ten kilometres from the sea the price drops by a third. That gap is the whole economy.'},
+  {id:'b12',pts:2,label:'Get a dog’s name before you get its owner’s name'},
+  {id:'b13',pts:2,label:'Get a stranger to say your name out loud'},
+  {id:'b14',pts:2,label:'A Fiat Panda with an animal inside',
+   note:'The 4x4 has been the shepherd’s car since 1983 — flat glass, Austrian gearbox, mud to the sills. If there’s a dog in the back, it works for a living.'},
+  {id:'b15',pts:3,label:'A pinnettu — the conical stone shepherd’s hut, up in the Supramonte behind Oliena',
+   note:'Dry stone, juniper poles, a hole for the smoke. Men slept in these for months at a time within living memory.'},
+  {id:'b16',pts:3,label:'A nuraghe with nobody at it: no sign, no ticket, no fence',
+   note:'There are around 7,000 of them. Nobody knows what they were for. Most are standing in someone’s field being ignored.'},
+  {id:'b17',pts:3,label:'Get someone to draw you a map by hand'},
+  {id:'b18',pts:3,label:'Get someone to show you the inside of their hat',
+   note:'The berritta is the long black cap; the coppola is the flat one. A man who has worn the same one for thirty years will turn it over and explain every stain.'}
+];
+
+var DIP_INTRO='The kingdom has never been conquered, but it has been visited by absolutely everyone. A princess must therefore establish relations. A selfie earns the points. A drink doubles it. You must be in the photo. You have to come away with one fact: where they’re going next, or what they’re driving. One per country per day. There will be second Germans. Second Germans are worth nothing.';
+var DIPQ=[
+  {id:'no', pts:10,fl:'🇳🇴',label:'Norway — anyone but us'},
+  {id:'sdf',pts:5, fl:'🇸🇪🇩🇰🇫🇮',label:'Sweden · Denmark · Finland'},
+  {id:'cor',pts:4, fl:'moor',label:'A Corsican'},
+  {id:'cph',pts:3, fl:'🇨🇿🇵🇱🇭🇺',label:'Czechia · Poland · Hungary'},
+  {id:'ukw',pts:2, fl:'🇬🇧🇮🇪🇪🇸🇵🇹',label:'UK · Ireland · Spain · Portugal'},
+  {id:'cha',pts:2, fl:'🇨🇭🇦🇹',label:'Switzerland · Austria'},
+  {id:'itm',pts:1, fl:'🇮🇹',label:'Italy, mainland — they must say where from'},
+  {id:'dnb',pts:1, fl:'🇩🇪🇳🇱🇧🇪',label:'Germany · Netherlands · Belgium'},
+  {id:'fr', pts:-2,fl:'🇫🇷',label:'France',neg:true}
+];
+var DIP_NOTES=[
+  'The Nordics are worth ten because the Nordics are not here. The flights land at Olbia and stop at Costa Smeralda; this coast is Germans and Dutch in vans. Anything Scandinavian on the east side arrived by accident, and you’ll spot it before you hear it: pale, over-equipped, reading the sign more carefully than the sign requires.',
+  'A Corsican is kin — you can see their island from the top of this one, and the language up there shades into theirs.',
+  'On France: in 1793 a French fleet came to take this island. The Sardinians threw them back into the sea without any help from Turin, and a young artillery officer named Bonaparte failed to take La Maddalena. Their reward from the mainland was nothing at all, which is why they threw the Piedmontese out too, on 28 April 1794.'
+];
+
+var MAX={main:67,side:41,bonus:35,dip:56};
+
+/* ————————————— state ————————————— */
+function blank(){return {main:{},side:{},bonus:{},dip:{}};}
+var S=blank();
+try{var raw=localStorage.getItem(KEY); if(raw){var p=JSON.parse(raw); S=Object.assign(blank(),p);}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function g(sec,id){if(!S[sec][id])S[sec][id]={};return S[sec][id];}
+
+function compute(){
+  var main=0,i;
+  for(i=0;i<MAINQ.length;i++){var o=g('main',MAINQ[i].id); if(o.done)main+=MAINQ[i].pts; if(o.intro)main+=5;}
+  var side=0;
+  for(i=0;i<SIDEQ.length;i++){var it=SIDEQ[i],so=g('side',it.id);
+    if(so.done)side+=it.base;
+    if(it.extra.kind==='tog'&&so.plus)side+=it.extra.pts;
+    if(it.extra.kind==='step')side+=(so.style||0);}
+  var bonus=0;
+  for(i=0;i<BONUSQ.length;i++){if(g('bonus',BONUSQ[i].id).done)bonus+=BONUSQ[i].pts;}
+  var dip=0;
+  for(i=0;i<DIPQ.length;i++){var d=DIPQ[i],dc=g('dip',d.id); if(dc.done)dip+=d.pts*(dc.drink?2:1);}
+  var total=main+side+bonus+dip;
+  var stage=0;
+  for(i=1;i<THR.length;i++){if(total>=THR[i])stage=i;}
+  return {main:main,side:side,bonus:bonus,dip:dip,total:total,stage:stage};
+}
+
+/* ————————————— html helpers ————————————— */
+function box(path,on){return '<label class="ck"><input type="checkbox" data-check="'+path+'"'+(on?' checked':'')+'><span class="fauxbox" aria-hidden="true"></span></label>';}
+function chip(path,on,lab){return '<button type="button" class="chip'+(on?' on':'')+'" aria-pressed="'+(!!on)+'" data-toggle="'+path+'">'+lab+'</button>';}
+function ptsBadge(n){return '<b class="pv">'+(n>0?n:'−'+(-n))+' pt'+(Math.abs(n)===1?'':'s')+'</b>';}
+function flagHtml(fl){return fl==='moor'?'<svg class="flmoor" viewBox="0 0 100 100" aria-label="Corsica"><use href="#moorU"/></svg>':'<span class="fl">'+fl+'</span>';}
+function gateHtml(c,big){
+  var h='<small>the gate</small>';
+  for(var i=0;i<THR.length;i++){
+    var lit=i<=c.stage&&(i===0||c.total>=THR[i]);
+    h+='<span class="gseal'+(lit?' lit':'')+'" data-gs="'+i+'">'+THR[i]+'</span>';
+  }
+  if(!big)h+='<span class="gflav">an introduction plus two questions clears each seal — no skipping ahead to easier company</span>';
+  return h;
+}
+
+/* ————————————— board minis ————————————— */
+function miniMain(c){
+  var h='';
+  for(var i=0;i<MAINQ.length;i++){
+    var q=MAINQ[i],o=g('main',q.id),open=c.total>=THR[q.stage]||q.stage===0;
+    if(open){
+      h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
+         '<span class="mlab">'+ROMAN[i]+'. '+q.q+'</span>'+
+         '<span class="mchip'+(o.intro?' on':'')+'">+5 intro</span>'+
+         '<span class="mpts"><b>'+q.pts+'</b></span></li>';
+    }else{
+      h+='<li class="mlock"><span class="mseal">'+THR[q.stage]+'</span>'+
+         '<span class="mlab">sealed in wax — opens at '+THR[q.stage]+' points ('+(THR[q.stage]-c.total)+' more)</span></li>';
+    }
+  }
+  return h;
+}
+function miniSide(){
+  var h='';
+  for(var i=0;i<SIDEQ.length;i++){
+    var it=SIDEQ[i],o=g('side',it.id),ex='';
+    if(it.extra.kind==='tog')ex='<span class="mchip'+(o.plus?' on':'')+'">+'+it.extra.pts+'</span>';
+    else ex='<span class="mstep">style '+(o.style||0)+'/5</span>';
+    h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
+       '<span class="mlab">'+it.label+'</span>'+ex+'<span class="mpts"><b>'+it.base+'</b></span></li>';
+  }
+  return h;
+}
+function miniBonus(){
+  var h='',last=0;
+  var tiers={1:'Easy — I point',2:'Real — II points',3:'Hard — III points'};
+  for(var i=0;i<BONUSQ.length;i++){
+    var b=BONUSQ[i],o=g('bonus',b.id);
+    if(b.pts!==last){h+='<li style="border-bottom:0;padding-bottom:0"><span class="tier">'+tiers[b.pts]+'</span></li>';last=b.pts;}
+    h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
+       '<span class="mlab">'+b.label+'</span><span class="mpts"><b>'+b.pts+'</b></span></li>';
+  }
+  return h;
+}
+function miniDip(){
+  var h='';
+  for(var i=0;i<DIPQ.length;i++){
+    var d=DIPQ[i],o=g('dip',d.id);
+    var val=o.done?d.pts*(o.drink?2:1):d.pts;
+    h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
+       flagHtml(d.fl)+'<span class="mlab">'+d.label+'</span>'+
+       '<span class="mchip'+(o.drink?' on':'')+'">×2</span>'+
+       '<span class="mpts"><b>'+(val<0?'−'+(-val):val)+'</b></span></li>';
+  }
+  return h;
+}
+
+/* ————————————— modals ————————————— */
+var overlay=document.getElementById('overlay');
+var modalBody=document.getElementById('modalBody');
+var modalTitle=document.getElementById('modalTitle');
+var modalSub=document.getElementById('modalSub');
+var currentModal=null;
+
+function proseHtml(paras){
+  var arr=Array.isArray(paras)?paras:[paras];
+  return '<div class="prose">'+arr.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+}
+
+function modalMain(c){
+  var h=proseHtml(MAIN_INTRO);
+  h+='<div class="gate modal-gate">'+gateHtml(c,true)+'</div>';
+  h+='<div class="gnote">'+MAIN_GATE+'</div>';
+  for(var i=0;i<MAINQ.length;i++){
+    var q=MAINQ[i],o=g('main',q.id),open=c.total>=THR[q.stage]||q.stage===0;
+    if(open){
+      h+='<div class="qrow'+(o.done?' done':'')+'"><span class="qnum">'+ROMAN[i]+'</span>'+
+         box('main.'+q.id+'.done',o.done)+
+         '<div class="qbody"><p class="qtext">'+q.q+' '+ptsBadge(q.pts)+'</p>'+
+         '<div class="extras">'+chip('main.'+q.id+'.intro',o.intro,'+5 introduced by name')+'</div></div></div>';
+    }else{
+      h+='<div class="qrow locked"><span class="qnum">'+ROMAN[i]+'</span><span class="sealio">'+THR[q.stage]+'</span>'+
+         '<div class="qbody"><p class="qtext lockt">Sealed in wax. Opens at '+THR[q.stage]+' points — <b>'+(THR[q.stage]-c.total)+'</b> more to break the seal.</p></div></div>';
+    }
+  }
+  h+='<div class="smallprint"><p>'+MAIN_TIPS+'</p></div>';
+  return h;
+}
+function modalSide(){
+  var h=proseHtml(SIDE_INTRO);
+  for(var i=0;i<SIDEQ.length;i++){
+    var it=SIDEQ[i],o=g('side',it.id);
+    var ex='';
+    if(it.extra.kind==='tog'){ex=chip('side.'+it.id+'.plus',o.plus,it.extra.lab);}
+    else{
+      ex='<span class="stepper"><button type="button" data-step="-1" data-path="side.'+it.id+'.style" aria-label="Less style">−</button>'+
+         '<span class="sval">'+(o.style||0)+' / 5</span>'+
+         '<button type="button" data-step="1" data-path="side.'+it.id+'.style" aria-label="More style">+</button></span>'+
+         '<span class="steplab">'+it.extra.lab+'</span>';
+    }
+    h+='<div class="qrow'+(o.done?' done':'')+'">'+
+       box('side.'+it.id+'.done',o.done)+
+       '<div class="qbody"><p class="qtext">'+it.label+' '+ptsBadge(it.base)+'</p>'+
+       '<p class="qnote">'+it.note+'</p>'+
+       '<div class="extras">'+ex+'</div></div></div>';
+  }
+  return h;
+}
+function modalBonus(){
+  var h=proseHtml(BONUS_INTRO),last=0;
+  var tiers={1:'Easy — 1 point each',2:'Real — 2 points each',3:'Hard — 3 points each'};
+  for(var i=0;i<BONUSQ.length;i++){
+    var b=BONUSQ[i],o=g('bonus',b.id);
+    if(b.pts!==last){h+='<p class="tier" style="font-size:10px;padding-top:10px">'+tiers[b.pts]+'</p>';last=b.pts;}
+    h+='<div class="qrow'+(o.done?' done':'')+'">'+
+       box('bonus.'+b.id+'.done',o.done)+
+       '<div class="qbody"><p class="qtext">'+b.label+' '+ptsBadge(b.pts)+'</p>'+
+       (b.note?'<p class="qnote">'+b.note+'</p>':'')+'</div></div>';
+  }
+  return h;
+}
+function modalDip(){
+  var h=proseHtml(DIP_INTRO);
+  for(var i=0;i<DIPQ.length;i++){
+    var d=DIPQ[i],o=g('dip',d.id);
+    var now=o.done?d.pts*(o.drink?2:1):0;
+    h+='<div class="qrow'+(o.done?' done':'')+(d.neg?' neg':'')+'">'+
+       box('dip.'+d.id+'.done',o.done)+
+       '<div class="qbody"><p class="qtext">'+flagHtml(d.fl)+' '+d.label+' '+ptsBadge(d.pts)+
+       (d.neg?' <span class="qnote" style="display:inline">— subtracts</span>':'')+'</p>'+
+       '<div class="extras">'+chip('dip.'+d.id+'.drink',o.drink,'+ drink — doubles')+
+       '<span class="steplab">banked: '+(now<0?'−'+(-now):now)+'</span></div></div></div>';
+  }
+  h+='<div class="smallprint">'+DIP_NOTES.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+  return h;
+}
+var resetArmed=false,resetTimer=null;
+function modalTally(c){
+  var rows=[['Main quest — know your people',c.main,MAX.main],
+            ['Side quests — a real princess',c.side,MAX.side],
+            ['Bonus — the Royal Inventory',c.bonus,MAX.bonus],
+            ['Diplomacy — foreign relations',c.dip,MAX.dip]];
+  var h='<table class="tally">';
+  for(var i=0;i<rows.length;i++){
+    h+='<tr><td>'+rows[i][0]+'</td><td>'+rows[i][1]+' <span style="color:var(--faded);font-weight:400">/ '+rows[i][2]+'</span></td></tr>';
+  }
+  h+='<tr class="tot"><td>The royal treasury</td><td>'+c.total+'</td></tr></table>';
+  h+='<div class="gate modal-gate" style="justify-content:center">'+gateHtml(c,true)+'</div>';
+  h+='<div class="resetwrap"><button type="button" class="resetseal'+(resetArmed?' armed':'')+'" data-act="reset">'+
+     (resetArmed?'Tap again — break the seal, erase everything':'Reset the quest — break the wax seal')+'</button>'+
+     '<p class="resethint">Kept on this device only. Occasional loss is the sea’s fee.</p></div>';
+  return h;
+}
+
+var MODALS={
+  main:{title:'Know Your People',sub:'Main Qvest · the seven questions',render:modalMain},
+  side:{title:'Act Like a Real Princess',sub:'Side Qvests · proofs, not activities',render:modalSide},
+  bonus:{title:'The Royal Inventory',sub:'Bonvs Qvests · runs all day underneath everything',render:modalBonus},
+  dip:{title:'Foreign Relations',sub:'Diplomacy · a selfie earns it, a drink doubles it',render:modalDip},
+  tally:{title:'The Royal Treasury',sub:'the tally of the day',render:modalTally}
+};
+function openModal(name){
+  currentModal=name;resetArmed=false;
+  var c=compute(),m=MODALS[name];
+  modalTitle.textContent=m.title;modalSub.textContent=m.sub;
+  modalBody.innerHTML=m.render(c);
+  overlay.hidden=false;modalBody.scrollTop=0;
+  document.getElementById('modalClose').focus({preventScroll:true});
+}
+function closeModal(){overlay.hidden=true;currentModal=null;resetArmed=false;}
+
+/* ————————————— render ————————————— */
+var prevStage=null,prevTotal=null;
+function renderAll(){
+  var c=compute();
+  document.getElementById('tnum').textContent=c.total;
+  document.getElementById('pv-main').textContent=c.main;
+  document.getElementById('pv-side').textContent=c.side;
+  document.getElementById('pv-bonus').textContent=c.bonus;
+  document.getElementById('pv-dip').textContent=c.dip;
+  document.getElementById('mini-main').innerHTML=miniMain(c);
+  document.getElementById('mini-side').innerHTML=miniSide();
+  document.getElementById('mini-bonus').innerHTML=miniBonus();
+  document.getElementById('mini-dip').innerHTML=miniDip();
+  document.getElementById('gate-main').innerHTML=gateHtml(c,false);
+  if(prevTotal!==null&&c.total!==prevTotal){
+    var t=document.getElementById('tracker');t.classList.remove('tick');void t.offsetWidth;t.classList.add('tick');
+  }
+  if(prevStage!==null&&c.stage>prevStage){
+    toast('A seal breaks — the gate opens at '+THR[c.stage]+' points.');
+    var seals=document.querySelectorAll('[data-gs="'+c.stage+'"]');
+    seals.forEach(function(s){s.classList.add('pop');});
+  }
+  prevStage=c.stage;prevTotal=c.total;
+  if(currentModal){
+    var st=modalBody.scrollTop;
+    modalBody.innerHTML=MODALS[currentModal].render(c);
+    modalBody.scrollTop=st;
+  }
+}
+var toastTimer=null;
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){el.classList.remove('show');},2800);
+}
+
+/* ————————————— mutations ————————————— */
+function setPath(path,val){var p=path.split('.');g(p[0],p[1])[p[2]]=val;}
+function afterChange(){save();renderAll();}
+
+modalBody.addEventListener('change',function(e){
+  var p=e.target.getAttribute&&e.target.getAttribute('data-check');
+  if(!p)return;
+  setPath(p,e.target.checked);afterChange();
+});
+modalBody.addEventListener('click',function(e){
+  var t=e.target.closest('[data-toggle],[data-step],[data-act]');
+  if(!t)return;
+  if(t.dataset.act==='reset'){
+    if(!resetArmed){
+      resetArmed=true;
+      clearTimeout(resetTimer);
+      resetTimer=setTimeout(function(){resetArmed=false;if(currentModal==='tally')renderAll();},4000);
+      renderAll();
+    }else{
+      resetArmed=false;S=blank();
+      try{localStorage.removeItem(KEY);}catch(err){}
+      prevStage=null;prevTotal=null;
+      closeModal();renderAll();
+      toast('The seal is broken. The quest begins anew.');
+    }
+    return;
+  }
+  if(t.dataset.toggle){
+    var p=t.dataset.toggle.split('.');var o=g(p[0],p[1]);o[p[2]]=!o[p[2]];afterChange();return;
+  }
+  if(t.dataset.step){
+    var pp=t.dataset.path.split('.');var oo=g(pp[0],pp[1]);
+    var v=(oo[pp[2]]||0)+parseInt(t.dataset.step,10);
+    oo[pp[2]]=Math.max(0,Math.min(5,v));afterChange();
+  }
+});
+document.getElementById('modalClose').addEventListener('click',closeModal);
+overlay.addEventListener('click',function(e){if(e.target===overlay)closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&currentModal)closeModal();});
+
+/* panels open their scrolls */
+[['panel-main','main'],['panel-side','side'],['panel-bonus','bonus'],['panel-dip','dip']].forEach(function(pair){
+  var el=document.getElementById(pair[0]);
+  el.addEventListener('click',function(){openModal(pair[1]);});
+  el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(pair[1]);}});
+});
+document.getElementById('tracker').addEventListener('click',function(){openModal('tally');});
+
+/* ————————————— decorative svg bits built by loop ————————————— */
+(function(){
+  var g=document.getElementById('rh'),h='';
+  var cx=737,cy=244;
+  for(var i=0;i<32;i++){
+    var a=i*Math.PI/16,x=cx+Math.cos(a)*1700,y=cy+Math.sin(a)*1700;
+    h+='<line x1="'+cx+'" y1="'+cy+'" x2="'+x.toFixed(0)+'" y2="'+y.toFixed(0)+
+       '" stroke="'+(i%8===0?'#a4161a':'#221b11')+'" stroke-width="'+(i%4===0?0.8:0.5)+
+       '" opacity="'+(i%8===0?0.09:0.05)+'"/>';
+  }
+  g.innerHTML=h;
+  var cr=document.getElementById('cr8'),ch='';
+  for(var j=0;j<8;j++){
+    var b=j*Math.PI/4+Math.PI/8;
+    ch+='<line x1="0" y1="0" x2="'+(Math.cos(b)*17).toFixed(1)+'" y2="'+(Math.sin(b)*17).toFixed(1)+'"/>';
+  }
+  cr.innerHTML=ch;
+})();
+
+/* ————————————— zoom & pan ————————————— */
+var vp=document.getElementById('vp'),canvas=document.getElementById('canvas'),board=document.getElementById('board');
+var BW=1380,BH=660,zoom=1,userZoomed=false;
+function applyZoom(){
+  canvas.style.width=(BW*zoom)+'px';canvas.style.height=(BH*zoom)+'px';
+  board.style.transform='scale('+zoom+')';
+}
+function setZoom(z,cx,cy){
+  z=Math.max(0.2,Math.min(3,z));
+  if(cx===undefined){cx=vp.clientWidth/2;cy=vp.clientHeight/2;}
+  var bx=(vp.scrollLeft+cx)/zoom,by=(vp.scrollTop+cy)/zoom;
+  zoom=z;applyZoom();
+  vp.scrollLeft=bx*zoom-cx;vp.scrollTop=by*zoom-cy;
+}
+function fitZoom(){
+  zoom=Math.min((vp.clientWidth-10)/BW,(vp.clientHeight-10)/BH);
+  zoom=Math.max(0.2,Math.min(1.6,zoom));
+  applyZoom();userZoomed=false;
+}
+document.getElementById('zin').addEventListener('click',function(){userZoomed=true;setZoom(zoom*1.3);});
+document.getElementById('zout').addEventListener('click',function(){userZoomed=true;setZoom(zoom/1.3);});
+document.getElementById('zfit').addEventListener('click',fitZoom);
+window.addEventListener('resize',function(){if(!userZoomed)fitZoom();});
+
+/* pinch on the board */
+var pinch=null;
+function tDist(e){var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;return Math.hypot(dx,dy);}
+function tMid(e){return [(e.touches[0].clientX+e.touches[1].clientX)/2,(e.touches[0].clientY+e.touches[1].clientY)/2];}
+vp.addEventListener('touchstart',function(e){
+  if(e.touches.length===2){pinch={d:tDist(e),z:zoom};}
+},{passive:true});
+vp.addEventListener('touchmove',function(e){
+  if(e.touches.length===2&&pinch){
+    e.preventDefault();userZoomed=true;
+    var m=tMid(e),r=vp.getBoundingClientRect();
+    setZoom(pinch.z*(tDist(e)/pinch.d),m[0]-r.left,m[1]-r.top);
+  }
+},{passive:false});
+vp.addEventListener('touchend',function(){pinch=null;});
+
+/* rotate hint fades away on its own */
+setTimeout(function(){document.getElementById('rotHint').classList.remove('show');},7000);
+document.getElementById('rotHint').addEventListener('click',function(){this.classList.remove('show');});
+
+/* ————————————— go ————————————— */
+renderAll();
+prevStage=compute().stage;prevTotal=compute().total;
+fitZoom();
+</script>
+</body>
+</html>
