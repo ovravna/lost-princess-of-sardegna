@@ -97,6 +97,17 @@ h1 .amp{color:var(--red)}
 .mast-sub{font-size:10px;font-style:italic;color:var(--ink-soft);letter-spacing:.12em;margin-top:3px}
 .mast-rule{width:150px;height:12px;flex:none;color:rgba(34,27,17,.7)}
 
+/* ————— language toggle ————— */
+.langsel{position:absolute;top:19px;right:24px;z-index:6;display:inline-flex;align-items:center;gap:0;
+  transform:rotate(.6deg);border:1px solid rgba(34,27,17,.85);border-radius:2px;overflow:hidden;
+  background:linear-gradient(160deg, rgba(249,243,226,.96), rgba(240,229,199,.9));
+  box-shadow:inset 0 0 0 2px rgba(249,243,226,.9), inset 0 0 0 3px rgba(164,22,26,.4), 1px 2px 6px rgba(60,40,14,.3)}
+.langsel .lglobe{width:14px;height:14px;margin:0 5px 0 7px;color:var(--faded);flex:none}
+.langbtn{border:0;background:transparent;font-variant-caps:small-caps;font-weight:700;letter-spacing:.14em;
+  font-size:12px;padding:5px 10px;color:var(--faded);line-height:1}
+.langbtn + .langbtn{border-left:1px solid rgba(34,27,17,.4)}
+.langbtn.on{background:radial-gradient(circle at 35% 28%,#c03a34,var(--red) 60%,var(--red-deep));color:var(--parch-hi)}
+
 /* ————— map ————— */
 .mapsvg{position:absolute;left:552px;top:86px;width:320px;height:367px;z-index:4;overflow:visible}
 
@@ -362,6 +373,13 @@ li.done .mlab{color:var(--ink-soft)}
         </svg>
       </header>
 
+      <!-- language toggle, pinned to the chart -->
+      <div class="langsel" id="langsel" role="group" aria-label="Language / Lingua">
+        <svg class="lglobe" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5,10 H17.5 M10,2.5 V17.5 M10,2.5 C6,6 6,14 10,17.5 C14,14 14,6 10,2.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        <button type="button" class="langbtn" data-lang="en">EN</button>
+        <button type="button" class="langbtn" data-lang="it">IT</button>
+      </div>
+
       <!-- the island -->
       <svg class="mapsvg" viewBox="0 0 410 470" aria-label="Old sailor’s map of Sardegna">
         <defs>
@@ -467,7 +485,7 @@ li.done .mlab{color:var(--ink-soft)}
         <div class="phead">
           <span class="pname">Main Qvest</span>
           <span class="pkicker">Know Your People</span>
-          <span class="ppts"><b id="pv-main">0</b> / 67 pts</span>
+          <span class="ppts"><b id="pv-main">0</b> <span class="unit" data-en="/ 67 pts">/ 67 pts</span></span>
         </div>
         <div class="pteaser">A crown is not a thing you are given, it is a thing you earn by knowing. Seven questions, seven strangers, a kilometre apart — and a gift bought in the village before.</div>
         <div class="gate" id="gate-main"></div>
@@ -480,7 +498,7 @@ li.done .mlab{color:var(--ink-soft)}
         <div class="phead">
           <span class="pname">Side Qvests</span>
           <span class="pkicker">Act Like a Real Princess</span>
-          <span class="ppts"><b id="pv-side">0</b> / 41 pts</span>
+          <span class="ppts"><b id="pv-side">0</b> <span class="unit" data-en="/ 56 pts">/ 56 pts</span></span>
         </div>
         <ul class="mini" id="mini-side"></ul>
         <span class="ptap">tap to unfurl</span>
@@ -491,7 +509,7 @@ li.done .mlab{color:var(--ink-soft)}
         <div class="phead">
           <span class="pname">Diplomacy</span>
           <span class="pkicker">Foreign Relations</span>
-          <span class="ppts"><b id="pv-dip">0</b> / 56 pts</span>
+          <span class="ppts"><b id="pv-dip">0</b> <span class="unit" data-en="/ 56 pts">/ 56 pts</span></span>
         </div>
         <ul class="mini" id="mini-dip"></ul>
         <span class="ptap">tap to unfurl</span>
@@ -502,7 +520,7 @@ li.done .mlab{color:var(--ink-soft)}
         <div class="phead">
           <span class="pname">Bonvs Qvests</span>
           <span class="pkicker">The Royal Inventory</span>
-          <span class="ppts"><b id="pv-bonus">0</b> / 35 pts</span>
+          <span class="ppts"><b id="pv-bonus">0</b> <span class="unit" data-en="/ 35 pts">/ 35 pts</span></span>
         </div>
         <ul class="mini" id="mini-bonus"></ul>
         <span class="ptap">tap to unfurl</span>
@@ -565,21 +583,165 @@ var KEY='sardegna-quest-v1';
 var THR=[0,15,30,45,60];
 var ROMAN=['I','II','III','IV','V','VI','VII'];
 
+/* ————————————— language ————————————— */
+var LANG=(function(){try{return localStorage.getItem('sardegna-lang')==='it'?'it':'en';}catch(e){return 'en';}})();
+function T(s){if(LANG!=='it')return s;var v=IT[s];return v==null?s:v;}
+/* interpolated strings: {n} placeholders */
+function tf(en,it,vals){var s=(LANG==='it'?it:en);return s.replace(/\{(\d)\}/g,function(_,i){return vals[i];});}
+function qs(sel){return document.querySelector(sel);}
+
+var IT={
+/* masthead & chrome */
+'Chart of one day’s reign · drawn at Orosei · A.D. MMXXVI':'Carta di un giorno di regno · tracciata a Orosei · A.D. MMXXVI',
+'furat chi benit dae su mare — he who comes from the sea, steals':'furat chi benit dae su mare — chi viene dal mare, ruba',
+'tap to unfurl':'tocca per aprire',
+'/ 67 pts':'/ 67 pti','/ 56 pts':'/ 56 pti','/ 35 pts':'/ 35 pti',
+'· you start here ·':'· parti da qui ·',
+'pvntos':'punti',
+'rotate for the full map':'ruota per la mappa intera',
+'Open the tally':'Apri il conto',
+'Roll the scroll closed':'Arrotola la pergamena',
+'Main quest — open the scroll':'Missione principale — apri la pergamena',
+'Side quests — open the scroll':'Missioni secondarie — apri la pergamena',
+'Diplomacy — open the scroll':'Diplomazia — apri la pergamena',
+'Bonus quests, the Royal Inventory — open the scroll':'Missioni bonus, l’inventario reale — apri la pergamena',
+'Full screen':'Schermo intero','Zoom in':'Ingrandisci','Zoom out':'Riduci','Fit the whole map':'Adatta tutta la mappa',
+/* panel headers */
+'Main Qvest':'Missione Principale','Side Qvests':'Missioni Secondarie','Diplomacy':'Diplomazia','Bonvs Qvests':'Missioni Bonus',
+'Know Your People':'Conosci la Tua Gente','Act Like a Real Princess':'Comportati da Vera Principessa','Foreign Relations':'Relazioni Estere','The Royal Inventory':'L’Inventario Reale',
+'A crown is not a thing you are given, it is a thing you earn by knowing. Seven questions, seven strangers, a kilometre apart — and a gift bought in the village before.':'Una corona non è qualcosa che ti viene data, è qualcosa che ti guadagni conoscendo. Sette domande, sette sconosciuti, a un chilometro di distanza — e un dono comprato nel paese prima.',
+/* gate */
+'the gate':'il varco',
+'an introduction plus two questions clears each seal — no skipping ahead to easier company':'una presentazione più due domande rompono ogni sigillo — non si salta avanti verso compagnia più facile',
+/* main quest */
+'If you were in charge here, what would you change?':'Se comandassi tu qui, cosa cambieresti?',
+'Do you feel more Sardinian or Italian?':'Ti senti più sardo o italiano?',
+'What dish did your mother or grandmother make that means home?':'Che piatto preparava tua madre o tua nonna che sa di casa?',
+'Why do people live so long here?':'Perché qui si vive così a lungo?',
+'Did your mother speak Sardinian to you? Do you — would you — speak it to your children?':'Tua madre ti parlava in sardo? Tu — lo parleresti — ai tuoi figli?',
+'Who were the four moors on the flag? Were they blindfolded?':'Chi erano i quattro mori della bandiera? Erano bendati?',
+'Why did you stay? / Why did you come back?':'Perché sei rimasto? / Perché sei tornato?',
+'A crown is not a thing you are given, it is a thing you earn by knowing. You have arrived in a kingdom that has never truly been conquered — only visited, taxed, and misunderstood, always by people who came from the sea. There is a saying here: <b>furat chi benit dae su mare</b> — he who comes from the sea, steals. It is why every old village turns its back on the coast. You have one day to stop being one of them.':'Una corona non è qualcosa che ti viene data, è qualcosa che ti guadagni conoscendo. Sei arrivata in un regno mai davvero conquistato — solo visitato, tassato e frainteso, sempre da gente venuta dal mare. Qui c’è un detto: <b>furat chi benit dae su mare</b> — chi viene dal mare, ruba. È per questo che ogni vecchio paese volta le spalle alla costa. Hai un giorno per smettere di essere una di loro.',
+'Seven questions. Each asked of a different person, at least 1 km apart. You must be introduced — ideally by the person before. You arrive with a gift, bought in the previous person’s village before you left it. You never dial the phone; if a call is made ahead of you, they make it. And when an answer runs dry, you ask the only question that keeps the chain alive: <b>“Who knows more about this than you?”</b>':'Sette domande. Ognuna posta a una persona diversa, ad almeno 1 km di distanza. Devi essere presentata — idealmente da chi ti ha preceduto. Arrivi con un dono, comprato nel paese della persona precedente prima di lasciarlo. Non componi mai il numero al telefono; se si fa una chiamata per annunciarti, la fanno loro. E quando una risposta si esaurisce, poni l’unica domanda che tiene viva la catena: <b>«Chi ne sa più di te su questo?»</b>',
+'The gate: 0 · 15 · 30 · 45 · 60 — you cannot move to the next person until you have banked 15 points from the one in front of you. An introduction plus two questions clears it; anything less and you haven’t met them, you’ve interviewed them. No skipping ahead to easier company.':'Il varco: 0 · 15 · 30 · 45 · 60 — non puoi passare alla persona successiva finché non hai messo da parte 15 punti da quella che ti sta davanti. Una presentazione più due domande lo aprono; qualcosa di meno e non li hai incontrati, li hai intervistati. Non si salta avanti verso compagnia più facile.',
+'Ask II anywhere and listen for the tell: people here say they are going to Italy when they take the ferry. Ask V of someone who winces — their generation was told the language would hold their children back at school. Ask III over a table if you can, and let them feed you. Ask VI of two people and watch them disagree, because the flag was officially changed in 1999 and not everyone has forgiven it.':'Fai la II ovunque e ascolta l’indizio: qui la gente dice che va «in Italia» quando prende il traghetto. Fai la V a qualcuno che fa una smorfia — alla sua generazione fu detto che la lingua avrebbe frenato i figli a scuola. Fai la III a tavola, se puoi, e lasciati sfamare. Fai la VI a due persone e guardale non essere d’accordo, perché la bandiera fu cambiata ufficialmente nel 1999 e non tutti l’hanno perdonato.',
+'+5 introduced by name':'+5 presentata per nome',
+'+5 intro':'+5 pres.',
+/* side quests */
+'Anyone can learn a realm. A sovereign must also be seen in it — on a horse, on the water, in the right clothes, with the right drink in her hand. These are not activities. They are proofs. Nothing counts if you paid for it and demanded it. Everything doubles if someone simply decided you should have it.':'Chiunque può imparare un regno. Una sovrana deve anche farsi vedere dentro di esso — a cavallo, sull’acqua, con gli abiti giusti, con il bicchiere giusto in mano. Queste non sono attività. Sono prove. Non vale nulla se l’hai pagato e preteso. Tutto raddoppia se qualcuno ha semplicemente deciso che dovevi averlo.',
+'Build a sand castle':'Costruisci un castello di sabbia',
+'style — awarded by your knight, no appeals':'stile — assegnato dal tuo cavaliere, senza appello',
+'Do it in sight of Castello della Fava at Posada, 40 minutes north. A real castle, on a real rock. Yours will be worse.':'Fallo in vista del Castello della Fava a Posada, 40 minuti a nord. Un vero castello, su una vera roccia. Il tuo sarà peggio.',
+'Ride a horse':'Cavalca un cavallo',
+'+5 offered freely':'+5 offerto spontaneamente',
+'This island has more horses per head than anywhere else in Italy. At Sedilo they race them downhill at a stone arch every July and people are genuinely hurt.':'Quest’isola ha più cavalli pro capite di qualsiasi altro luogo in Italia. A Sedilo li lanciano in discesa sotto un arco di pietra ogni luglio e la gente si fa male sul serio.',
+'Sail on a ship':'Naviga su una barca',
+'Any hull, any length of time, but you hold the tiller.':'Qualsiasi scafo, per qualsiasi durata, ma la barra la tieni tu.',
+'Try local home made spirit':'Assaggia un distillato fatto in casa',
+'Fil’e ferru — “iron wire.” When distilling was taxed, they buried the bottles and left a wire poking out to find them again. The name is a confession.':'Fil’e ferru — «filo di ferro». Quando distillare era tassato, seppellivano le bottiglie e lasciavano spuntare un filo per ritrovarle. Il nome è una confessione.',
+'Eat a local dish':'Mangia un piatto locale',
+'+5 someone makes it for you':'+5 qualcuno te lo cucina',
+'Culurgiones sealed like little wheat-ears, malloreddus, porceddu turned on a spit. Bonus if it never saw a menu.':'Culurgiones chiusi come spighe di grano, malloreddus, porceddu allo spiedo. Bonus se non ha mai visto un menù.',
+'Drink a local beer':'Bevi una birra locale',
+'Ichnusa, brewed on the island and wearing the four moors on its label — the same flag you are trying to understand.':'Ichnusa, prodotta sull’isola e con i quattro mori sull’etichetta — la stessa bandiera che stai cercando di capire.',
+'Wear a dress from Sardegna':'Indossa un abito della Sardegna',
+'+5 the knight likes it':'+5 al cavaliere piace',
+'His vote, and he pays. Every village has its own, down to the stitch — a Sardinian can read where a woman is from across a piazza. They come out for festas and funerals, and on 1 May in Cagliari, all of them at once.':'Il suo voto, e paga lui. Ogni paese ha il proprio, fin nel punto di cucito — un sardo capisce da dove viene una donna attraverso la piazza. Escono per le feste e i funerali, e il 1° maggio a Cagliari, tutti insieme.',
+/* bonus quests */
+'No one rules what they have not looked at. A kingdom is not its monuments — it is the caps, the dogs, the stiff laundry, the dying cars. The Inventory runs all day underneath everything else. First to claim it owns it; nobody claims the same thing twice. Anything engineered on purpose is void — it has to arise. Anything the other cannot verify with their own eyes is void. One veto each per day: either of you may kill a claim as cheap, and cheap means you both knew it was there before you saw it.':'Nessuno governa ciò che non ha guardato. Un regno non sono i suoi monumenti — sono i berretti, i cani, il bucato irrigidito, le auto morenti. L’Inventario scorre tutto il giorno sotto ogni altra cosa. Chi lo rivendica per primo lo possiede; nessuno rivendica la stessa cosa due volte. Tutto ciò che è architettato di proposito non vale — deve capitare. Tutto ciò che l’altro non può verificare con i propri occhi non vale. Un veto a testa al giorno: ognuno può bocciare una rivendicazione come «facile», e facile vuol dire che lo sapevate entrambi prima di vederlo.',
+'Laundry left out so long it’s gone stiff':'Bucato lasciato fuori così a lungo da essersi irrigidito',
+'A bar sign hand-painted and never repainted':'Un’insegna di bar dipinta a mano e mai ridipinta',
+'Something made of marble that has no business being marble':'Qualcosa di marmo che non ha motivo di essere di marmo',
+'Orosei sits on a marble seam shipped all over the world. The kerbs are offcuts. People rest beer on stone that would be a hotel lobby in Dubai.':'Orosei sta su una vena di marmo spedito in tutto il mondo. I cordoli sono scarti. La gente appoggia la birra su una pietra che a Dubai sarebbe la hall di un hotel.',
+'An old man on a bench':'Un vecchio su una panchina',
+'The bench is an institution with rules. Same men, same order, same hour. Nobody’s wife is on it.':'La panchina è un’istituzione con delle regole. Stessi uomini, stesso ordine, stessa ora. Nessuna moglie ci siede.',
+'Get someone to hum or sing a few bars of anything':'Fatti canticchiare o cantare qualche nota di qualcosa',
+'Cantu a tenore is four voices, and two of them are animals — the bassu is an ox, the contra a sheep. One man cannot do it alone. He will try anyway, then start phoning people.':'Il cantu a tenore è a quattro voci, e due sono animali — il bassu è un bue, la contra una pecora. Un uomo da solo non ci riesce. Ci proverà comunque, poi comincerà a telefonare in giro.',
+'A road sign with the town name in Sardinian under the Italian, inland only':'Un cartello stradale col nome del paese in sardo sotto l’italiano, solo nell’entroterra',
+'Ulìana for Oliena. Nùgoro for Nuoro. The coast doesn’t bother.':'Ulìana per Oliena. Nùgoro per Nuoro. La costa non si prende il disturbo.',
+'A road sign with bullet holes in it':'Un cartello stradale coi buchi di pallini',
+'Boar hunters. Nobody replaces the sign.':'Cacciatori di cinghiali. Nessuno sostituisce il cartello.',
+'Livestock stopping you completely — not beside the road, stopping you':'Bestiame che ti ferma del tutto — non a lato della strada, ti ferma',
+'The flock has the right of way and knows it. So does the man behind it, who will not hurry.':'Il gregge ha la precedenza e lo sa. Anche l’uomo dietro, che non ha fretta.',
+'A cork oak stripped to the red':'Una quercia da sughero scortecciata fino al rosso',
+'Stripped once every nine years and painted with the year it was done, so you can read the tree like a receipt. The bare trunk looks skinned.':'Scortecciata una volta ogni nove anni e segnata con l’anno in cui è stata fatta, così leggi l’albero come uno scontrino. Il tronco nudo sembra scuoiato.',
+'A roadside shrine for someone who died on that curve':'Un’edicola votiva sul ciglio per qualcuno morto su quella curva',
+'Fresh flowers mean somebody still drives that road every week.':'Fiori freschi vogliono dire che qualcuno percorre ancora quella strada ogni settimana.',
+'A coffee under €1.20, inland bars only, no chance on the coast':'Un caffè sotto €1,20, solo bar dell’entroterra, sulla costa non c’è speranza',
+'Ten kilometres from the sea the price drops by a third. That gap is the whole economy.':'A dieci chilometri dal mare il prezzo cala di un terzo. Quel divario è tutta l’economia.',
+'Get a dog’s name before you get its owner’s name':'Scopri il nome del cane prima di quello del padrone',
+'Get a stranger to say your name out loud':'Fatti dire il tuo nome ad alta voce da uno sconosciuto',
+'A Fiat Panda with an animal inside':'Una Fiat Panda con un animale dentro',
+'The 4x4 has been the shepherd’s car since 1983 — flat glass, Austrian gearbox, mud to the sills. If there’s a dog in the back, it works for a living.':'La 4x4 è l’auto del pastore dal 1983 — vetri piatti, cambio austriaco, fango fino alle soglie. Se c’è un cane dietro, lavora per vivere.',
+'A pinnettu — the conical stone shepherd’s hut, up in the Supramonte behind Oliena':'Un pinnettu — la capanna conica di pietra del pastore, su nel Supramonte dietro Oliena',
+'Dry stone, juniper poles, a hole for the smoke. Men slept in these for months at a time within living memory.':'Pietra a secco, pali di ginepro, un foro per il fumo. A memoria d’uomo, ci si dormiva per mesi interi.',
+'A nuraghe with nobody at it: no sign, no ticket, no fence':'Un nuraghe senza nessuno: niente cartello, niente biglietto, niente recinzione',
+'There are around 7,000 of them. Nobody knows what they were for. Most are standing in someone’s field being ignored.':'Ce ne sono circa 7.000. Nessuno sa a cosa servissero. La maggior parte sta nel campo di qualcuno, ignorata.',
+'Get someone to draw you a map by hand':'Fatti disegnare una mappa a mano da qualcuno',
+'Get someone to show you the inside of their hat':'Fatti mostrare l’interno del cappello di qualcuno',
+'The berritta is the long black cap; the coppola is the flat one. A man who has worn the same one for thirty years will turn it over and explain every stain.':'La berritta è il lungo copricapo nero; la coppola è quella piatta. Un uomo che porta lo stesso da trent’anni lo rivolterà e ti spiegherà ogni macchia.',
+'Easy — I point':'Facile — I punto','Real — II points':'Vero — II punti','Hard — III points':'Difficile — III punti',
+'Easy — 1 point each':'Facile — 1 punto l’uno','Real — 2 points each':'Vero — 2 punti l’uno','Hard — 3 points each':'Difficile — 3 punti l’uno',
+/* diplomacy */
+'The kingdom has never been conquered, but it has been visited by absolutely everyone. A princess must therefore establish relations. A selfie earns the points. A drink doubles it. You must be in the photo. You have to come away with one fact: where they’re going next, or what they’re driving. One per country per day. There will be second Germans. Second Germans are worth nothing.':'Il regno non è mai stato conquistato, ma è stato visitato proprio da tutti. Una principessa deve quindi stabilire delle relazioni. Un selfie vale i punti. Un drink li raddoppia. Devi essere nella foto. Devi portarti via un fatto: dove andranno poi, o cosa guidano. Uno per nazione al giorno. Ci saranno secondi tedeschi. I secondi tedeschi non valgono nulla.',
+'Norway — anyone but us':'Norvegia — chiunque tranne noi',
+'Sweden · Denmark · Finland':'Svezia · Danimarca · Finlandia',
+'A Corsican':'Un corso',
+'Czechia · Poland · Hungary':'Cechia · Polonia · Ungheria',
+'UK · Ireland · Spain · Portugal':'Regno Unito · Irlanda · Spagna · Portogallo',
+'Switzerland · Austria':'Svizzera · Austria',
+'Italy, mainland — they must say where from':'Italia, continente — devono dire da dove',
+'Germany · Netherlands · Belgium':'Germania · Paesi Bassi · Belgio',
+'France':'Francia',
+'The Nordics are worth ten because the Nordics are not here. The flights land at Olbia and stop at Costa Smeralda; this coast is Germans and Dutch in vans. Anything Scandinavian on the east side arrived by accident, and you’ll spot it before you hear it: pale, over-equipped, reading the sign more carefully than the sign requires.':'I nordici valgono dieci perché i nordici non ci sono. I voli atterrano a Olbia e si fermano alla Costa Smeralda; questa costa è tedeschi e olandesi in furgone. Qualsiasi cosa scandinava sul lato est è arrivata per caso, e la noterai prima di sentirla: pallidi, sovra-attrezzati, che leggono il cartello con più cura di quanta ne chieda.',
+'A Corsican is kin — you can see their island from the top of this one, and the language up there shades into theirs.':'Un corso è parente — dalla cima di quest’isola si vede la loro, e la lingua lassù sfuma nella loro.',
+'On France: in 1793 a French fleet came to take this island. The Sardinians threw them back into the sea without any help from Turin, and a young artillery officer named Bonaparte failed to take La Maddalena. Their reward from the mainland was nothing at all, which is why they threw the Piedmontese out too, on 28 April 1794.':'Sulla Francia: nel 1793 una flotta francese venne a prendersi l’isola. I sardi la ributtarono in mare senza alcun aiuto da Torino, e un giovane ufficiale d’artiglieria di nome Bonaparte non riuscì a prendere La Maddalena. La loro ricompensa dal continente fu proprio niente, ed è per questo che cacciarono anche i piemontesi, il 28 aprile 1794.',
+'+ drink — doubles':'+ drink — raddoppia',
+'— subtracts':'— sottrae',
+/* modal titles & subs */
+'a letter from the cartographer':'una lettera dal cartografo',
+'Know Your People · the seven questions':'Conosci la tua gente · le sette domande',
+'Act Like a Real Princess · proofs, not activities':'Comportati da vera principessa · prove, non attività',
+'The Royal Inventory · runs all day underneath everything':'L’inventario reale · scorre tutto il giorno sotto ogni cosa',
+'Foreign Relations · a selfie earns it, a drink doubles it':'Relazioni estere · un selfie lo vale, un drink lo raddoppia',
+'The Royal Treasury':'Il Tesoro Reale',
+'the tally of the day':'il conto del giorno',
+/* welcome */
+'Benvenuta in Sardegna. Today you are not a tourist — you are a <b>princess-in-waiting</b>, and this chart is your one day to earn the crown. The island does not give crowns away; it gives them to those who come to know it — its people, its horses, its stiff laundry.':'Benvenuta in Sardegna. Oggi non sei una turista — sei una <b>principessa in attesa</b>, e questa carta è il tuo unico giorno per guadagnare la corona. L’isola non regala corone; le dà a chi arriva a conoscerla — la sua gente, i suoi cavalli, il suo bucato irrigidito.',
+'Every scroll on this map holds quests. Every quest pays points into the red wax seal in the corner. Points break the five seals of the <b>Main Quest</b>, one stranger at a time, until the island has no choice but to crown you.':'Ogni pergamena su questa mappa contiene missioni. Ogni missione versa punti nel sigillo di ceralacca rosso nell’angolo. I punti rompono i cinque sigilli della <b>Missione Principale</b>, uno sconosciuto alla volta, finché all’isola non resta che incoronarti.',
+'You do not ride alone. With you goes your <b>trusted knight</b> — loyal, decorative, and unable to speak a single word of Italian. Ahead trots your squire, <b>Dodò the dog</b>, who speaks a bit more Italian than the knight and will open more doors. Choose your interpreter wisely.':'Non cavalchi da sola. Con te va il tuo <b>fido cavaliere</b> — leale, decorativo, e incapace di dire una sola parola d’italiano. Davanti trotterella il tuo scudiero, <b>Dodò il cane</b>, che d’italiano ne mastica un po’ più del cavaliere e aprirà più porte. Scegli con saggezza il tuo interprete.',
+'Tap a scroll to unfurl it. Tap the seal to see the tally. Andiamo.':'Tocca una pergamena per aprirla. Tocca il sigillo per vedere il conto. Andiamo.',
+'Begin the quest':'Inizia la missione',
+/* tally */
+'Main quest — know your people':'Missione principale — conosci la tua gente',
+'Side quests — a real princess':'Missioni secondarie — una vera principessa',
+'Bonus — the Royal Inventory':'Bonus — l’inventario reale',
+'Diplomacy — foreign relations':'Diplomazia — relazioni estere',
+'The royal treasury':'Il tesoro reale',
+'Reset the quest — break the wax seal':'Azzera la missione — rompi il sigillo di ceralacca',
+'Tap again — break the seal, erase everything':'Tocca ancora — rompi il sigillo, cancella tutto',
+'Kept on this device only. Occasional loss is the sea’s fee.':'Conservato solo su questo dispositivo. La perdita occasionale è il pedaggio del mare.',
+/* points & toasts */
+'pt':'pt','pts':'pti',
+'The seal is broken. The quest begins anew.':'Il sigillo è rotto. La missione ricomincia.',
+'On iPhone: tap Share, then “Add to Home Screen” — opened from there, the chart fills the whole screen.':'Su iPhone: tocca Condividi, poi «Aggiungi a Home» — aperta da lì, la carta riempie tutto lo schermo.'
+};
+
 var MAINQ=[
   {id:'m1',pts:5,stage:0,q:'If you were in charge here, what would you change?'},
   {id:'m2',pts:5,stage:0,q:'Do you feel more Sardinian or Italian?'},
-  {id:'m3',pts:5,stage:1,q:'Why did you stay? / Why did you come back?'},
-  {id:'m4',pts:5,stage:1,q:'Did your mother speak Sardinian to you? Do you — would you — speak it to your children?'},
-  {id:'m5',pts:4,stage:2,q:'Why do people live so long here?'},
-  {id:'m6',pts:4,stage:3,q:'Who was Eleonora d’Arborea?'},
-  {id:'m7',pts:4,stage:4,q:'Who were the four moors on the flag? Were they blindfolded?'}
+  {id:'m6',pts:4,stage:1,q:'What dish did your mother or grandmother make that means home?'},
+  {id:'m5',pts:4,stage:1,q:'Why do people live so long here?'},
+  {id:'m4',pts:5,stage:2,q:'Did your mother speak Sardinian to you? Do you — would you — speak it to your children?'},
+  {id:'m7',pts:4,stage:3,q:'Who were the four moors on the flag? Were they blindfolded?'},
+  {id:'m3',pts:5,stage:4,q:'Why did you stay? / Why did you come back?'}
 ];
 var MAIN_INTRO=[
   'A crown is not a thing you are given, it is a thing you earn by knowing. You have arrived in a kingdom that has never truly been conquered — only visited, taxed, and misunderstood, always by people who came from the sea. There is a saying here: <b>furat chi benit dae su mare</b> — he who comes from the sea, steals. It is why every old village turns its back on the coast. You have one day to stop being one of them.',
   'Seven questions. Each asked of a different person, at least 1 km apart. You must be introduced — ideally by the person before. You arrive with a gift, bought in the previous person’s village before you left it. You never dial the phone; if a call is made ahead of you, they make it. And when an answer runs dry, you ask the only question that keeps the chain alive: <b>“Who knows more about this than you?”</b>'
 ];
 var MAIN_GATE='The gate: 0 · 15 · 30 · 45 · 60 — you cannot move to the next person until you have banked 15 points from the one in front of you. An introduction plus two questions clears it; anything less and you haven’t met them, you’ve interviewed them. No skipping ahead to easier company.';
-var MAIN_TIPS='Ask 2 anywhere and listen for the tell instead: people here say they are going to Italy when they take the ferry. Ask 4 of someone who winces — their generation was told the language would hold their children back at school. Ask 6 of anyone; ask 7 of two people and watch them disagree, because the flag was officially changed in 1999 and not everyone has forgiven it.';
+var MAIN_TIPS='Ask II anywhere and listen for the tell: people here say they are going to Italy when they take the ferry. Ask V of someone who winces — their generation was told the language would hold their children back at school. Ask III over a table if you can, and let them feed you. Ask VI of two people and watch them disagree, because the flag was officially changed in 1999 and not everyone has forgiven it.';
 
 var SIDE_INTRO='Anyone can learn a realm. A sovereign must also be seen in it — on a horse, on the water, in the right clothes, with the right drink in her hand. These are not activities. They are proofs. Nothing counts if you paid for it and demanded it. Everything doubles if someone simply decided you should have it.';
 var SIDEQ=[
@@ -591,6 +753,10 @@ var SIDEQ=[
    note:'Any hull, any length of time, but you hold the tiller.'},
   {id:'spirit',base:3,label:'Try local home made spirit',extra:{kind:'tog',pts:5,lab:'+5 offered freely'},
    note:'Fil’e ferru — “iron wire.” When distilling was taxed, they buried the bottles and left a wire poking out to find them again. The name is a confession.'},
+  {id:'eat',base:3,label:'Eat a local dish',extra:{kind:'tog',pts:5,lab:'+5 someone makes it for you'},
+   note:'Culurgiones sealed like little wheat-ears, malloreddus, porceddu turned on a spit. Bonus if it never saw a menu.'},
+  {id:'beer',base:2,label:'Drink a local beer',extra:{kind:'tog',pts:5,lab:'+5 offered freely'},
+   note:'Ichnusa, brewed on the island and wearing the four moors on its label — the same flag you are trying to understand.'},
   {id:'dress',base:5,label:'Wear a dress from Sardegna',extra:{kind:'tog',pts:5,lab:'+5 the knight likes it'},
    note:'His vote, and he pays. Every village has its own, down to the stitch — a Sardinian can read where a woman is from across a piazza. They come out for festas and funerals, and on 1 May in Cagliari, all of them at once.'}
 ];
@@ -648,7 +814,7 @@ var DIP_NOTES=[
   'On France: in 1793 a French fleet came to take this island. The Sardinians threw them back into the sea without any help from Turin, and a young artillery officer named Bonaparte failed to take La Maddalena. Their reward from the mainland was nothing at all, which is why they threw the Piedmontese out too, on 28 April 1794.'
 ];
 
-var MAX={main:67,side:41,bonus:35,dip:56};
+var MAX={main:67,side:56,bonus:35,dip:56};
 
 /* ————————————— state ————————————— */
 function blank(){return {main:{},side:{},bonus:{},dip:{}};}
@@ -678,15 +844,15 @@ function compute(){
 /* ————————————— html helpers ————————————— */
 function box(path,on){return '<label class="ck"><input type="checkbox" data-check="'+path+'"'+(on?' checked':'')+'><span class="fauxbox" aria-hidden="true"></span></label>';}
 function chip(path,on,lab){return '<button type="button" class="chip'+(on?' on':'')+'" aria-pressed="'+(!!on)+'" data-toggle="'+path+'">'+lab+'</button>';}
-function ptsBadge(n){return '<b class="pv">'+(n>0?n:'−'+(-n))+' pt'+(Math.abs(n)===1?'':'s')+'</b>';}
+function ptsBadge(n){return '<b class="pv">'+(n>0?n:'−'+(-n))+' '+(Math.abs(n)===1?T('pt'):T('pts'))+'</b>';}
 function flagHtml(fl){return fl==='moor'?'<svg class="flmoor" viewBox="0 0 100 100" aria-label="Corsica"><use href="#moorU"/></svg>':'<span class="fl">'+fl+'</span>';}
 function gateHtml(c,big){
-  var h='<small>the gate</small>';
+  var h='<small>'+T('the gate')+'</small>';
   for(var i=0;i<THR.length;i++){
     var lit=i<=c.stage&&(i===0||c.total>=THR[i]);
     h+='<span class="gseal'+(lit?' lit':'')+'" data-gs="'+i+'">'+THR[i]+'</span>';
   }
-  if(!big)h+='<span class="gflav">an introduction plus two questions clears each seal — no skipping ahead to easier company</span>';
+  if(!big)h+='<span class="gflav">'+T('an introduction plus two questions clears each seal — no skipping ahead to easier company')+'</span>';
   return h;
 }
 
@@ -697,12 +863,12 @@ function miniMain(c){
     var q=MAINQ[i],o=g('main',q.id),open=c.total>=THR[q.stage]||q.stage===0;
     if(open){
       h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
-         '<span class="mlab">'+ROMAN[i]+'. '+q.q+'</span>'+
-         '<span class="mchip'+(o.intro?' on':'')+'">+5 intro</span>'+
+         '<span class="mlab">'+ROMAN[i]+'. '+T(q.q)+'</span>'+
+         '<span class="mchip'+(o.intro?' on':'')+'">'+T('+5 intro')+'</span>'+
          '<span class="mpts"><b>'+q.pts+'</b></span></li>';
     }else{
       h+='<li class="mlock"><span class="mseal">'+THR[q.stage]+'</span>'+
-         '<span class="mlab">sealed in wax — opens at '+THR[q.stage]+' points ('+(THR[q.stage]-c.total)+' more)</span></li>';
+         '<span class="mlab">'+tf('sealed in wax — opens at {0} points ({1} more)','sigillato nella cera — si apre a {0} punti ({1} in più)',[THR[q.stage],THR[q.stage]-c.total])+'</span></li>';
     }
   }
   return h;
@@ -712,20 +878,20 @@ function miniSide(){
   for(var i=0;i<SIDEQ.length;i++){
     var it=SIDEQ[i],o=g('side',it.id),ex='';
     if(it.extra.kind==='tog')ex='<span class="mchip'+(o.plus?' on':'')+'">+'+it.extra.pts+'</span>';
-    else ex='<span class="mstep">style '+(o.style||0)+'/5</span>';
+    else ex='<span class="mstep">'+tf('style {0}/5','stile {0}/5',[o.style||0])+'</span>';
     h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
-       '<span class="mlab">'+it.label+'</span>'+ex+'<span class="mpts"><b>'+it.base+'</b></span></li>';
+       '<span class="mlab">'+T(it.label)+'</span>'+ex+'<span class="mpts"><b>'+it.base+'</b></span></li>';
   }
   return h;
 }
 function miniBonus(){
   var h='',last=0;
-  var tiers={1:'Easy — I point',2:'Real — II points',3:'Hard — III points'};
+  var tiers={1:T('Easy — I point'),2:T('Real — II points'),3:T('Hard — III points')};
   for(var i=0;i<BONUSQ.length;i++){
     var b=BONUSQ[i],o=g('bonus',b.id);
     if(b.pts!==last){h+='<li style="border-bottom:0;padding-bottom:0"><span class="tier">'+tiers[b.pts]+'</span></li>';last=b.pts;}
     h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
-       '<span class="mlab">'+b.label+'</span><span class="mpts"><b>'+b.pts+'</b></span></li>';
+       '<span class="mlab">'+T(b.label)+'</span><span class="mpts"><b>'+b.pts+'</b></span></li>';
   }
   return h;
 }
@@ -735,7 +901,7 @@ function miniDip(){
     var d=DIPQ[i],o=g('dip',d.id);
     var val=o.done?d.pts*(o.drink?2:1):d.pts;
     h+='<li class="'+(o.done?'done':'')+'"><span class="mbox">'+(o.done?'✕':'')+'</span>'+
-       flagHtml(d.fl)+'<span class="mlab">'+d.label+'</span>'+
+       flagHtml(d.fl)+'<span class="mlab">'+T(d.label)+'</span>'+
        '<span class="mchip'+(o.drink?' on':'')+'">×2</span>'+
        '<span class="mpts"><b>'+(val<0?'−'+(-val):val)+'</b></span></li>';
   }
@@ -751,26 +917,26 @@ var currentModal=null;
 
 function proseHtml(paras){
   var arr=Array.isArray(paras)?paras:[paras];
-  return '<div class="prose">'+arr.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+  return '<div class="prose">'+arr.map(function(p){return '<p>'+T(p)+'</p>';}).join('')+'</div>';
 }
 
 function modalMain(c){
   var h=proseHtml(MAIN_INTRO);
   h+='<div class="gate modal-gate">'+gateHtml(c,true)+'</div>';
-  h+='<div class="gnote">'+MAIN_GATE+'</div>';
+  h+='<div class="gnote">'+T(MAIN_GATE)+'</div>';
   for(var i=0;i<MAINQ.length;i++){
     var q=MAINQ[i],o=g('main',q.id),open=c.total>=THR[q.stage]||q.stage===0;
     if(open){
       h+='<div class="qrow'+(o.done?' done':'')+'"><span class="qnum">'+ROMAN[i]+'</span>'+
          box('main.'+q.id+'.done',o.done)+
-         '<div class="qbody"><p class="qtext">'+q.q+' '+ptsBadge(q.pts)+'</p>'+
-         '<div class="extras">'+chip('main.'+q.id+'.intro',o.intro,'+5 introduced by name')+'</div></div></div>';
+         '<div class="qbody"><p class="qtext">'+T(q.q)+' '+ptsBadge(q.pts)+'</p>'+
+         '<div class="extras">'+chip('main.'+q.id+'.intro',o.intro,T('+5 introduced by name'))+'</div></div></div>';
     }else{
       h+='<div class="qrow locked"><span class="qnum">'+ROMAN[i]+'</span><span class="sealio">'+THR[q.stage]+'</span>'+
-         '<div class="qbody"><p class="qtext lockt">Sealed in wax. Opens at '+THR[q.stage]+' points — <b>'+(THR[q.stage]-c.total)+'</b> more to break the seal.</p></div></div>';
+         '<div class="qbody"><p class="qtext lockt">'+tf('Sealed in wax. Opens at {0} points — <b>{1}</b> more to break the seal.','Sigillato nella cera. Si apre a {0} punti — <b>{1}</b> in più per rompere il sigillo.',[THR[q.stage],THR[q.stage]-c.total])+'</p></div></div>';
     }
   }
-  h+='<div class="smallprint"><p>'+MAIN_TIPS+'</p></div>';
+  h+='<div class="smallprint"><p>'+T(MAIN_TIPS)+'</p></div>';
   return h;
 }
 function modalSide(){
@@ -778,31 +944,31 @@ function modalSide(){
   for(var i=0;i<SIDEQ.length;i++){
     var it=SIDEQ[i],o=g('side',it.id);
     var ex='';
-    if(it.extra.kind==='tog'){ex=chip('side.'+it.id+'.plus',o.plus,it.extra.lab);}
+    if(it.extra.kind==='tog'){ex=chip('side.'+it.id+'.plus',o.plus,T(it.extra.lab));}
     else{
       ex='<span class="stepper"><button type="button" data-step="-1" data-path="side.'+it.id+'.style" aria-label="Less style">−</button>'+
          '<span class="sval">'+(o.style||0)+' / 5</span>'+
          '<button type="button" data-step="1" data-path="side.'+it.id+'.style" aria-label="More style">+</button></span>'+
-         '<span class="steplab">'+it.extra.lab+'</span>';
+         '<span class="steplab">'+T(it.extra.lab)+'</span>';
     }
     h+='<div class="qrow'+(o.done?' done':'')+'">'+
        box('side.'+it.id+'.done',o.done)+
-       '<div class="qbody"><p class="qtext">'+it.label+' '+ptsBadge(it.base)+'</p>'+
-       '<p class="qnote">'+it.note+'</p>'+
+       '<div class="qbody"><p class="qtext">'+T(it.label)+' '+ptsBadge(it.base)+'</p>'+
+       '<p class="qnote">'+T(it.note)+'</p>'+
        '<div class="extras">'+ex+'</div></div></div>';
   }
   return h;
 }
 function modalBonus(){
   var h=proseHtml(BONUS_INTRO),last=0;
-  var tiers={1:'Easy — 1 point each',2:'Real — 2 points each',3:'Hard — 3 points each'};
+  var tiers={1:T('Easy — 1 point each'),2:T('Real — 2 points each'),3:T('Hard — 3 points each')};
   for(var i=0;i<BONUSQ.length;i++){
     var b=BONUSQ[i],o=g('bonus',b.id);
     if(b.pts!==last){h+='<p class="tier" style="font-size:10px;padding-top:10px">'+tiers[b.pts]+'</p>';last=b.pts;}
     h+='<div class="qrow'+(o.done?' done':'')+'">'+
        box('bonus.'+b.id+'.done',o.done)+
-       '<div class="qbody"><p class="qtext">'+b.label+' '+ptsBadge(b.pts)+'</p>'+
-       (b.note?'<p class="qnote">'+b.note+'</p>':'')+'</div></div>';
+       '<div class="qbody"><p class="qtext">'+T(b.label)+' '+ptsBadge(b.pts)+'</p>'+
+       (b.note?'<p class="qnote">'+T(b.note)+'</p>':'')+'</div></div>';
   }
   return h;
 }
@@ -813,29 +979,29 @@ function modalDip(){
     var now=o.done?d.pts*(o.drink?2:1):0;
     h+='<div class="qrow'+(o.done?' done':'')+(d.neg?' neg':'')+'">'+
        box('dip.'+d.id+'.done',o.done)+
-       '<div class="qbody"><p class="qtext">'+flagHtml(d.fl)+' '+d.label+' '+ptsBadge(d.pts)+
-       (d.neg?' <span class="qnote" style="display:inline">— subtracts</span>':'')+'</p>'+
-       '<div class="extras">'+chip('dip.'+d.id+'.drink',o.drink,'+ drink — doubles')+
-       '<span class="steplab">banked: '+(now<0?'−'+(-now):now)+'</span></div></div></div>';
+       '<div class="qbody"><p class="qtext">'+flagHtml(d.fl)+' '+T(d.label)+' '+ptsBadge(d.pts)+
+       (d.neg?' <span class="qnote" style="display:inline">'+T('— subtracts')+'</span>':'')+'</p>'+
+       '<div class="extras">'+chip('dip.'+d.id+'.drink',o.drink,T('+ drink — doubles'))+
+       '<span class="steplab">'+tf('banked: {0}','in cassa: {0}',[now<0?'−'+(-now):now])+'</span></div></div></div>';
   }
-  h+='<div class="smallprint">'+DIP_NOTES.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+  h+='<div class="smallprint">'+DIP_NOTES.map(function(p){return '<p>'+T(p)+'</p>';}).join('')+'</div>';
   return h;
 }
 var resetArmed=false,resetTimer=null;
 function modalTally(c){
-  var rows=[['Main quest — know your people',c.main,MAX.main],
-            ['Side quests — a real princess',c.side,MAX.side],
-            ['Bonus — the Royal Inventory',c.bonus,MAX.bonus],
-            ['Diplomacy — foreign relations',c.dip,MAX.dip]];
+  var rows=[[T('Main quest — know your people'),c.main,MAX.main],
+            [T('Side quests — a real princess'),c.side,MAX.side],
+            [T('Bonus — the Royal Inventory'),c.bonus,MAX.bonus],
+            [T('Diplomacy — foreign relations'),c.dip,MAX.dip]];
   var h='<table class="tally">';
   for(var i=0;i<rows.length;i++){
     h+='<tr><td>'+rows[i][0]+'</td><td>'+rows[i][1]+' <span style="color:var(--faded);font-weight:400">/ '+rows[i][2]+'</span></td></tr>';
   }
-  h+='<tr class="tot"><td>The royal treasury</td><td>'+c.total+'</td></tr></table>';
+  h+='<tr class="tot"><td>'+T('The royal treasury')+'</td><td>'+c.total+'</td></tr></table>';
   h+='<div class="gate modal-gate" style="justify-content:center">'+gateHtml(c,true)+'</div>';
   h+='<div class="resetwrap"><button type="button" class="resetseal'+(resetArmed?' armed':'')+'" data-act="reset">'+
-     (resetArmed?'Tap again — break the seal, erase everything':'Reset the quest — break the wax seal')+'</button>'+
-     '<p class="resethint">Kept on this device only. Occasional loss is the sea’s fee.</p></div>';
+     (resetArmed?T('Tap again — break the seal, erase everything'):T('Reset the quest — break the wax seal'))+'</button>'+
+     '<p class="resethint">'+T('Kept on this device only. Occasional loss is the sea’s fee.')+'</p></div>';
   return h;
 }
 
@@ -846,7 +1012,7 @@ function modalWelcome(){
     'Every scroll on this map holds quests. Every quest pays points into the red wax seal in the corner. Points break the five seals of the <b>Main Quest</b>, one stranger at a time, until the island has no choice but to crown you.',
     'You do not ride alone. With you goes your <b>trusted knight</b> — loyal, decorative, and unable to speak a single word of Italian. Ahead trots your squire, <b>Dodò the dog</b>, who speaks a bit more Italian than the knight and will open more doors. Choose your interpreter wisely.',
     'Tap a scroll to unfurl it. Tap the seal to see the tally. Andiamo.'
-  ])+'<div class="resetwrap"><button type="button" class="beginbtn" data-act="begin">Begin the quest</button></div>';
+  ])+'<div class="resetwrap"><button type="button" class="beginbtn" data-act="begin">'+T('Begin the quest')+'</button></div>';
 }
 function markWelcomed(){try{localStorage.setItem(WELCOME_KEY,'1');}catch(e){}}
 var MODALS={
@@ -860,7 +1026,7 @@ var MODALS={
 function openModal(name){
   currentModal=name;resetArmed=false;
   var c=compute(),m=MODALS[name];
-  modalTitle.textContent=m.title;modalSub.textContent=m.sub;
+  modalTitle.textContent=T(m.title);modalSub.textContent=T(m.sub);
   modalBody.innerHTML=m.render(c);
   overlay.hidden=false;modalBody.scrollTop=0;
   document.getElementById('modalClose').focus({preventScroll:true});
@@ -868,6 +1034,43 @@ function openModal(name){
 function closeModal(){
   if(currentModal==='welcome')markWelcomed();
   overlay.hidden=true;currentModal=null;resetArmed=false;
+}
+
+/* ————————————— static text / language ————————————— */
+var PANELS=[['panel-main','Main Qvest','Know Your People','Main quest — open the scroll'],
+            ['panel-side','Side Qvests','Act Like a Real Princess','Side quests — open the scroll'],
+            ['panel-dip','Diplomacy','Foreign Relations','Diplomacy — open the scroll'],
+            ['panel-bonus','Bonvs Qvests','The Royal Inventory','Bonus quests, the Royal Inventory — open the scroll']];
+function applyStatic(){
+  document.documentElement.lang=LANG;
+  qs('.eyebrow').textContent=T('Chart of one day’s reign · drawn at Orosei · A.D. MMXXVI');
+  qs('h1').innerHTML=(LANG==='it')?'La Principessa Perduta <span class="amp">di</span> Sardegna':'The Lost Princess <span class="amp">of</span> Sardegna';
+  qs('.mast-sub').textContent=T('furat chi benit dae su mare — he who comes from the sea, steals');
+  qs('.pteaser').textContent=T('A crown is not a thing you are given, it is a thing you earn by knowing. Seven questions, seven strangers, a kilometre apart — and a gift bought in the village before.');
+  PANELS.forEach(function(p){
+    var el=document.getElementById(p[0]);
+    el.querySelector('.pname').textContent=T(p[1]);
+    el.querySelector('.pkicker').textContent=T(p[2]);
+    el.querySelector('.ptap').textContent=T('tap to unfurl');
+    var u=el.querySelector('.unit');u.textContent=T(u.getAttribute('data-en')||u.textContent);
+    el.setAttribute('aria-label',T(p[3]));
+  });
+  qs('.start').textContent=T('· you start here ·');
+  qs('.t-lab').textContent=T('pvntos');
+  qs('#rotHint').lastChild.textContent=' '+T('rotate for the full map')+' ';
+  document.getElementById('tracker').setAttribute('aria-label',T('Open the tally'));
+  document.getElementById('modalClose').setAttribute('aria-label',T('Roll the scroll closed'));
+  [['zfs','Full screen'],['zin','Zoom in'],['zout','Zoom out'],['zfit','Fit the whole map']].forEach(function(z){
+    document.getElementById(z[0]).setAttribute('aria-label',T(z[1]));
+  });
+  document.querySelectorAll('#langsel .langbtn').forEach(function(b){
+    b.classList.toggle('on',b.dataset.lang===LANG);
+  });
+}
+function setLang(l){
+  if(l!=='it')l='en';
+  LANG=l;try{localStorage.setItem('sardegna-lang',l);}catch(e){}
+  applyStatic();renderAll();
 }
 
 /* ————————————— render ————————————— */
@@ -888,13 +1091,15 @@ function renderAll(){
     var t=document.getElementById('tracker');t.classList.remove('tick');void t.offsetWidth;t.classList.add('tick');
   }
   if(prevStage!==null&&c.stage>prevStage){
-    toast('A seal breaks — the gate opens at '+THR[c.stage]+' points.');
+    toast(tf('A seal breaks — the gate opens at {0} points.','Un sigillo si rompe — il varco si apre a {0} punti.',[THR[c.stage]]));
     var seals=document.querySelectorAll('[data-gs="'+c.stage+'"]');
     seals.forEach(function(s){s.classList.add('pop');});
   }
   prevStage=c.stage;prevTotal=c.total;
   if(currentModal){
     var st=modalBody.scrollTop;
+    modalTitle.textContent=T(MODALS[currentModal].title);
+    modalSub.textContent=T(MODALS[currentModal].sub);
     modalBody.innerHTML=MODALS[currentModal].render(c);
     modalBody.scrollTop=st;
   }
@@ -931,7 +1136,7 @@ modalBody.addEventListener('click',function(e){
       try{localStorage.removeItem(KEY);localStorage.removeItem(WELCOME_KEY);}catch(err){}
       prevStage=null;prevTotal=null;
       closeModal();renderAll();
-      toast('The seal is broken. The quest begins anew.');
+      toast(T('The seal is broken. The quest begins anew.'));
     }
     return;
   }
@@ -955,6 +1160,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&currentModa
   el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(pair[1]);}});
 });
 document.getElementById('tracker').addEventListener('click',function(){openModal('tally');});
+
+/* language toggle */
+document.getElementById('langsel').addEventListener('click',function(e){
+  var b=e.target.closest('[data-lang]');if(!b)return;setLang(b.dataset.lang);
+});
 
 /* ————————————— decorative svg bits built by loop ————————————— */
 (function(){
@@ -1028,7 +1238,7 @@ fsBtn.addEventListener('click',function(){
   }else if(el.webkitRequestFullscreen){
     el.webkitRequestFullscreen();
   }else{
-    toast('On iPhone: tap Share, then “Add to Home Screen” — opened from there, the chart fills the whole screen.',6000);
+    toast(T('On iPhone: tap Share, then “Add to Home Screen” — opened from there, the chart fills the whole screen.'),6000);
   }
 });
 ['fullscreenchange','webkitfullscreenchange'].forEach(function(ev){
@@ -1040,6 +1250,7 @@ setTimeout(function(){document.getElementById('rotHint').classList.remove('show'
 document.getElementById('rotHint').addEventListener('click',function(){this.classList.remove('show');});
 
 /* ————————————— go ————————————— */
+applyStatic();
 renderAll();
 prevStage=compute().stage;prevTotal=compute().total;
 fitZoom();
