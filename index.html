@@ -311,6 +311,35 @@ li.done .mlab{color:var(--ink-soft)}
 .compass line{stroke:var(--ink-soft);stroke-width:.8}
 .scalebar{stroke:var(--ink-soft);stroke-width:1}
 
+/* ————— coronation ————— */
+.tracker.crowned{
+  background:radial-gradient(circle at 34% 28%, #ffe9a8 0%, #f0b81e 44%, #b5820c 90%);
+  box-shadow:inset 0 2px 5px rgba(255,245,210,.6), inset 0 -8px 12px rgba(120,80,4,.5), 0 5px 18px rgba(190,140,12,.55);
+  color:#5a3d06;
+}
+.tracker.crowned::before{border-color:rgba(90,61,6,.45)}
+.tracker.crowned::after{background:radial-gradient(circle at 40% 20%, #f0b81e 30%, #b5820c)}
+.tracker.crowned .t-num{text-shadow:0 -1px 0 rgba(120,80,4,.7),0 1px 1px rgba(255,245,210,.5)}
+.tracker.crowned .t-lab{opacity:.9}
+.tracker.crowned{animation:crownglow 2.4s ease-in-out infinite}
+@keyframes crownglow{50%{box-shadow:inset 0 2px 5px rgba(255,245,210,.6), inset 0 -8px 12px rgba(120,80,4,.5), 0 6px 24px rgba(240,184,30,.85)}}
+
+.coronation{text-align:center}
+.crown-hero{position:relative;display:inline-block;width:100%;max-width:330px;margin:2px auto 4px}
+.crown-hero img{display:block;width:100%;border-radius:3px;border:1px solid var(--ink);
+  box-shadow:0 8px 22px rgba(0,0,0,.5), inset 0 0 0 3px rgba(247,240,220,.9)}
+.crownlay{position:absolute;left:55%;top:24%;width:19%;transform:translate(-50%,-100%);
+  filter:drop-shadow(0 2px 3px rgba(70,45,0,.55))}
+.crown-msg{font-style:italic;color:var(--ink-soft);font-size:13px;line-height:1.5;margin:12px 6px 15px}
+.crown-msg .amp{color:var(--red);font-style:normal}
+.crown-metlab{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--faded);margin-bottom:8px}
+.crown-met{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.crown-met img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:2px;border:1px solid var(--ink);
+  box-shadow:0 2px 7px rgba(60,40,14,.4), inset 0 0 0 2px rgba(247,240,220,.85)}
+.crown-tally{margin-top:12px}
+.crown-tally button{background:none;border:0;font-family:var(--serif);font-style:italic;color:var(--red);
+  font-size:11.5px;letter-spacing:.06em}
+
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -708,6 +737,14 @@ var IT={
 'Foreign Relations · a selfie earns it, a drink doubles it':'Relazioni estere · un selfie lo vale, un drink lo raddoppia',
 'The Royal Treasury':'Il Tesoro Reale',
 'the tally of the day':'il conto del giorno',
+/* coronation */
+'The Coronation':'L’Incoronazione',
+'one hundred points — the island crowns you':'cento punti — l’isola ti incorona',
+'The princess, crowned':'La principessa, incoronata',
+'One hundred points, and the island has run out of reasons. You were introduced, you asked, you listened, you were fed and taught and sent onward — and somewhere between the sand castle and the seventh stranger you stopped being someone who came from the sea. Wear the crown. You earned it by knowing.':'Cento punti, e all’isola sono finite le scuse. Sei stata presentata, hai chiesto, hai ascoltato, ti hanno sfamata e istruita e mandata avanti — e da qualche parte tra il castello di sabbia e il settimo sconosciuto hai smesso di essere una venuta dal mare. Indossa la corona. Te la sei guadagnata conoscendo.',
+'the people who let you in':'le persone che ti hanno accolta',
+'Long may she reign':'Lunga vita alla regina',
+'· see the royal tally ·':'· vedi il tesoro reale ·',
 /* welcome */
 'Benvenuta in Sardegna. Today you are not a tourist — you are a <b>princess-in-waiting</b>, and this chart is your one day to earn the crown. The island does not give crowns away; it gives them to those who come to know it — its people, its horses, its stiff laundry.':'Benvenuta in Sardegna. Oggi non sei una turista — sei una <b>principessa in attesa</b>, e questa carta è il tuo unico giorno per guadagnare la corona. L’isola non regala corone; le dà a chi arriva a conoscerla — la sua gente, i suoi cavalli, il suo bucato irrigidito.',
 'Every scroll on this map holds quests. Every quest pays points into the red wax seal in the corner. Points break the five seals of the <b>Main Quest</b>, one stranger at a time, until the island has no choice but to crown you.':'Ogni pergamena su questa mappa contiene missioni. Ogni missione versa punti nel sigillo di ceralacca rosso nell’angolo. I punti rompono i cinque sigilli della <b>Missione Principale</b>, uno sconosciuto alla volta, finché all’isola non resta che incoronarti.',
@@ -1019,13 +1056,36 @@ function modalWelcome(){
   ])+'<div class="resetwrap"><button type="button" class="beginbtn" data-act="begin">'+T('Begin the quest')+'</button></div>';
 }
 function markWelcomed(){try{localStorage.setItem(WELCOME_KEY,'1');}catch(e){}}
+function modalCrown(){
+  var crown='<svg class="crownlay" viewBox="0 0 100 74" aria-hidden="true">'+
+    '<defs><linearGradient id="crg" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#f0b81e"/><stop offset="1" stop-color="#b5820c"/>'+
+    '</linearGradient></defs>'+
+    '<path d="M10,58 L18,27 L34,47 L50,18 L66,47 L82,27 L90,58 Z" fill="url(#crg)" stroke="#8a5e0c" stroke-width="2.5" stroke-linejoin="round"/>'+
+    '<path d="M8,57 H92 L89,71 H11 Z" fill="url(#crg)" stroke="#8a5e0c" stroke-width="2.5" stroke-linejoin="round"/>'+
+    '<circle cx="18" cy="25" r="5" fill="#ffe9a8" stroke="#8a5e0c" stroke-width="2"/>'+
+    '<circle cx="50" cy="15.5" r="5.5" fill="#ffe9a8" stroke="#8a5e0c" stroke-width="2"/>'+
+    '<circle cx="82" cy="25" r="5" fill="#ffe9a8" stroke="#8a5e0c" stroke-width="2"/>'+
+    '<circle cx="25" cy="64" r="3" fill="#a4161a" stroke="#7a0e12" stroke-width="1"/>'+
+    '<circle cx="50" cy="64" r="3.4" fill="#a4161a" stroke="#7a0e12" stroke-width="1"/>'+
+    '<circle cx="75" cy="64" r="3" fill="#a4161a" stroke="#7a0e12" stroke-width="1"/></svg>';
+  return '<div class="coronation">'+
+    '<div class="crown-hero"><img src="photos/princess.jpg" alt="'+T('The princess, crowned')+'">'+crown+'</div>'+
+    '<p class="crown-msg">'+T('One hundred points, and the island has run out of reasons. You were introduced, you asked, you listened, you were fed and taught and sent onward — and somewhere between the sand castle and the seventh stranger you stopped being someone who came from the sea. Wear the crown. You earned it by knowing.')+'</p>'+
+    '<p class="crown-metlab">'+T('the people who let you in')+'</p>'+
+    '<div class="crown-met"><img src="photos/met-1.jpg" alt=""><img src="photos/met-2.jpg" alt=""><img src="photos/met-3.jpg" alt=""><img src="photos/met-4.jpg" alt=""></div>'+
+    '<div class="resetwrap"><button type="button" class="beginbtn" data-act="close-crown">'+T('Long may she reign')+'</button>'+
+    '<p class="crown-tally"><button type="button" data-act="tally-link">'+T('· see the royal tally ·')+'</button></p></div>'+
+    '</div>';
+}
 var MODALS={
   welcome:{title:'Ciao, Alice!',sub:'a letter from the cartographer',render:modalWelcome},
   main:{title:'Main Qvest',sub:'Know Your People · the seven questions',render:modalMain},
   side:{title:'Side Qvests',sub:'Act Like a Real Princess · proofs, not activities',render:modalSide},
   bonus:{title:'Bonvs Qvests',sub:'The Royal Inventory · runs all day underneath everything',render:modalBonus},
   dip:{title:'Diplomacy',sub:'Foreign Relations · a selfie earns it, a drink doubles it',render:modalDip},
-  tally:{title:'The Royal Treasury',sub:'the tally of the day',render:modalTally}
+  tally:{title:'The Royal Treasury',sub:'the tally of the day',render:modalTally},
+  crown:{title:'The Coronation',sub:'one hundred points — the island crowns you',render:modalCrown}
 };
 function openModal(name){
   currentModal=name;resetArmed=false;
@@ -1082,6 +1142,7 @@ var prevStage=null,prevTotal=null;
 function renderAll(){
   var c=compute();
   document.getElementById('tnum').textContent=c.total;
+  document.getElementById('tracker').classList.toggle('crowned',c.total>=100);
   document.getElementById('pv-main').textContent=c.main;
   document.getElementById('pv-side').textContent=c.side;
   document.getElementById('pv-bonus').textContent=c.bonus;
@@ -1099,6 +1160,7 @@ function renderAll(){
     var seals=document.querySelectorAll('[data-gs="'+c.stage+'"]');
     seals.forEach(function(s){s.classList.add('pop');});
   }
+  if(prevTotal!==null&&prevTotal<100&&c.total>=100){openModal('crown');}
   prevStage=c.stage;prevTotal=c.total;
   if(currentModal){
     var st=modalBody.scrollTop;
@@ -1128,7 +1190,8 @@ modalBody.addEventListener('change',function(e){
 modalBody.addEventListener('click',function(e){
   var t=e.target.closest('[data-toggle],[data-step],[data-act]');
   if(!t)return;
-  if(t.dataset.act==='begin'){closeModal();return;}
+  if(t.dataset.act==='begin'||t.dataset.act==='close-crown'){closeModal();return;}
+  if(t.dataset.act==='tally-link'){openModal('tally');return;}
   if(t.dataset.act==='reset'){
     if(!resetArmed){
       resetArmed=true;
@@ -1163,7 +1226,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&currentModa
   el.addEventListener('click',function(){openModal(pair[1]);});
   el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(pair[1]);}});
 });
-document.getElementById('tracker').addEventListener('click',function(){openModal('tally');});
+document.getElementById('tracker').addEventListener('click',function(){openModal(compute().total>=100?'crown':'tally');});
 
 /* language toggle */
 document.getElementById('langsel').addEventListener('click',function(e){
