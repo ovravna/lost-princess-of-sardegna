@@ -173,6 +173,11 @@ li.done .mlab{color:var(--ink-soft)}
 .gseal.lit{color:var(--parch-hi);border-color:var(--red-deep);
   background:radial-gradient(circle at 35% 28%,#cb4038,var(--red) 52%,var(--red-deep) 92%);
   box-shadow:inset 0 1px 3px rgba(255,235,210,.4), inset 0 -3px 4px rgba(60,6,8,.5), 0 1px 2px rgba(40,20,8,.45)}
+.gseal.gcrown{cursor:default}
+.gseal.gcrown.lit{color:#5a3d06;border-color:#8a5e0c;cursor:pointer;
+  background:radial-gradient(circle at 35% 28%, #ffe9a8, #f0b81e 55%, #b5820c 92%);
+  box-shadow:inset 0 1px 3px rgba(255,245,210,.5), inset 0 -3px 4px rgba(120,80,4,.4), 0 1px 2px rgba(120,80,4,.5)}
+.gseal.gcrown.lit:hover{filter:brightness(1.05)}
 .gseal.pop{animation:sealpop .5s ease}
 @keyframes sealpop{0%{transform:scale(.6)}55%{transform:scale(1.25)}100%{transform:scale(1)}}
 .gflav{font-size:8.5px;font-style:italic;color:var(--faded);margin-left:auto;max-width:210px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -330,7 +335,9 @@ li.done .mlab{color:var(--ink-soft)}
   box-shadow:0 8px 22px rgba(0,0,0,.5), inset 0 0 0 3px rgba(247,240,220,.9)}
 .crownlay{position:absolute;left:55%;top:24%;width:19%;transform:translate(-50%,-100%);
   filter:drop-shadow(0 2px 3px rgba(70,45,0,.55))}
-.crown-msg{font-style:italic;color:var(--ink-soft);font-size:13px;line-height:1.5;margin:12px 6px 15px}
+.crown-hail{font-variant-caps:small-caps;letter-spacing:.05em;color:var(--red);font-weight:700;font-size:17px;line-height:1.2;margin:13px 8px 2px;
+  text-shadow:1px 1px 0 rgba(164,22,26,.18)}
+.crown-msg{font-style:italic;color:var(--ink-soft);font-size:13px;line-height:1.5;margin:7px 6px 15px}
 .crown-msg .amp{color:var(--red);font-style:normal}
 .crown-metlab{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--faded);margin-bottom:8px}
 .crown-met{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -738,6 +745,8 @@ var IT={
 'The Royal Treasury':'Il Tesoro Reale',
 'the tally of the day':'il conto del giorno',
 /* coronation */
+'the coronation':'l’incoronazione',
+'Congratulations — you are now the Princess of Sardegna.':'Congratulazioni — ora sei la Principessa di Sardegna.',
 'The Coronation':'L’Incoronazione',
 'one hundred points — the island crowns you':'cento punti — l’isola ti incorona',
 'The princess, crowned':'La principessa, incoronata',
@@ -893,6 +902,7 @@ function gateHtml(c,big){
     var lit=i<=c.stage&&(i===0||c.total>=THR[i]);
     h+='<span class="gseal'+(lit?' lit':'')+'" data-gs="'+i+'">'+THR[i]+'</span>';
   }
+  h+='<span class="gseal gcrown'+(c.total>=100?' lit':'')+'" data-crown="1" title="'+T('the coronation')+'">100</span>';
   if(!big)h+='<span class="gflav">'+T('an introduction plus two questions clears each seal — no skipping ahead to easier company')+'</span>';
   return h;
 }
@@ -1071,6 +1081,7 @@ function modalCrown(){
     '<circle cx="75" cy="64" r="3" fill="#a4161a" stroke="#7a0e12" stroke-width="1"/></svg>';
   return '<div class="coronation">'+
     '<div class="crown-hero"><img src="photos/princess.jpg" alt="'+T('The princess, crowned')+'">'+crown+'</div>'+
+    '<p class="crown-hail">'+T('Congratulations — you are now the Princess of Sardegna.')+'</p>'+
     '<p class="crown-msg">'+T('One hundred points, and the island has run out of reasons. You were introduced, you asked, you listened, you were fed and taught and sent onward — and somewhere between the sand castle and the seventh stranger you stopped being someone who came from the sea. Wear the crown. You earned it by knowing.')+'</p>'+
     '<p class="crown-metlab">'+T('the people who let you in')+'</p>'+
     '<div class="crown-met"><img src="photos/met-1.jpg" alt=""><img src="photos/met-2.jpg" alt=""><img src="photos/met-3.jpg" alt=""><img src="photos/met-4.jpg" alt=""></div>'+
@@ -1188,8 +1199,9 @@ modalBody.addEventListener('change',function(e){
   setPath(p,e.target.checked);afterChange();
 });
 modalBody.addEventListener('click',function(e){
-  var t=e.target.closest('[data-toggle],[data-step],[data-act]');
+  var t=e.target.closest('[data-toggle],[data-step],[data-act],[data-crown]');
   if(!t)return;
+  if(t.dataset.crown){if(compute().total>=100)openModal('crown');return;}
   if(t.dataset.act==='begin'||t.dataset.act==='close-crown'){closeModal();return;}
   if(t.dataset.act==='tally-link'){openModal('tally');return;}
   if(t.dataset.act==='reset'){
@@ -1227,6 +1239,12 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&currentModa
   el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(pair[1]);}});
 });
 document.getElementById('tracker').addEventListener('click',function(){openModal(compute().total>=100?'crown':'tally');});
+
+/* the gold 100 seal in the board gate opens the coronation */
+document.getElementById('gate-main').addEventListener('click',function(e){
+  var cr=e.target.closest('[data-crown]');
+  if(cr){e.stopPropagation();if(compute().total>=100)openModal('crown');}
+});
 
 /* language toggle */
 document.getElementById('langsel').addEventListener('click',function(e){
