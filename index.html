@@ -7,9 +7,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Sardegna">
-<title>The Lost Princess of Sardegna</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f5eed8'/%3E%3Crect x='6' width='4' height='16' fill='%23a4161a'/%3E%3Crect y='6' width='16' height='4' fill='%23a4161a'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-title" content="Lost Princess of Sardegna">
+<meta name="application-name" content="Lost Princess of Sardegna">
+<title>Lost Princess of Sardegna</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 /* ————— tokens ————— */
 :root{
@@ -120,7 +124,8 @@ h1 .amp{color:var(--red)}
 .p-main{background:linear-gradient(160deg, rgba(249,243,226,.96), rgba(240,229,199,.92));
   box-shadow:inset 0 0 0 3px rgba(249,243,226,.9), inset 0 0 0 5px rgba(164,22,26,.55), 1px 3px 8px rgba(60,40,14,.35)}
 .phead{display:flex;align-items:baseline;gap:8px;border-bottom:1px solid rgba(34,27,17,.55);padding-bottom:4px;margin-bottom:5px}
-.pkicker{font-size:8px;letter-spacing:.34em;text-transform:uppercase;color:var(--faded)}
+.pkicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.p-main .pkicker{font-size:12px}
 .pname{font-variant-caps:small-caps;letter-spacing:.1em;font-weight:700;color:var(--red);font-size:15px}
 .p-main .pname{font-size:19px}
 .ppts{margin-left:auto;font-size:10px;color:var(--ink-soft);white-space:nowrap}
@@ -221,7 +226,7 @@ li.done .mlab{color:var(--ink-soft)}
 .scroll-head{display:flex;align-items:center;gap:10px;padding:16px 16px 8px;border-bottom:2px solid rgba(164,22,26,.5);flex:none}
 .scroll-head .crest{width:34px;height:38px}
 .scroll-head h2{font-variant-caps:small-caps;letter-spacing:.12em;color:var(--red);font-size:20px;font-weight:700;line-height:1.1}
-.scroll-head .sub{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--faded)}
+.scroll-head .sub{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
 .mclose{margin-left:auto;flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;font-size:16px}
 .scroll-body{overflow-y:auto;padding:10px 16px 20px;font-size:13.5px;-webkit-overflow-scrolling:touch}
 
@@ -447,8 +452,8 @@ li.done .mlab{color:var(--ink-soft)}
       <!-- MAIN QUEST -->
       <section class="panel p-main" id="panel-main" role="button" tabindex="0" aria-label="Main quest — open the scroll">
         <div class="phead">
-          <span class="pkicker">Main Qvest</span>
-          <span class="pname">Know Your People</span>
+          <span class="pname">Main Qvest</span>
+          <span class="pkicker">Know Your People</span>
           <span class="ppts"><b id="pv-main">0</b> / 67 pts</span>
         </div>
         <div class="pteaser">A crown is not a thing you are given, it is a thing you earn by knowing. Seven questions, seven strangers, a kilometre apart — and a gift bought in the village before.</div>
@@ -460,8 +465,8 @@ li.done .mlab{color:var(--ink-soft)}
       <!-- SIDE QUESTS -->
       <section class="panel p-side" id="panel-side" role="button" tabindex="0" aria-label="Side quests — open the scroll">
         <div class="phead">
-          <span class="pkicker">Side Qvests</span>
-          <span class="pname">Act Like a Real Princess</span>
+          <span class="pname">Side Qvests</span>
+          <span class="pkicker">Act Like a Real Princess</span>
           <span class="ppts"><b id="pv-side">0</b> / 41 pts</span>
         </div>
         <ul class="mini" id="mini-side"></ul>
@@ -471,8 +476,8 @@ li.done .mlab{color:var(--ink-soft)}
       <!-- DIPLOMACY -->
       <section class="panel p-dip" id="panel-dip" role="button" tabindex="0" aria-label="Diplomacy — open the scroll">
         <div class="phead">
-          <span class="pkicker">Diplomacy</span>
-          <span class="pname">Foreign Relations</span>
+          <span class="pname">Diplomacy</span>
+          <span class="pkicker">Foreign Relations</span>
           <span class="ppts"><b id="pv-dip">0</b> / 56 pts</span>
         </div>
         <ul class="mini" id="mini-dip"></ul>
@@ -482,8 +487,8 @@ li.done .mlab{color:var(--ink-soft)}
       <!-- BONUS -->
       <section class="panel p-bonus" id="panel-bonus" role="button" tabindex="0" aria-label="Bonus quests, the Royal Inventory — open the scroll">
         <div class="phead">
-          <span class="pkicker">Bonvs Qvests</span>
-          <span class="pname">The Royal Inventory</span>
+          <span class="pname">Bonvs Qvests</span>
+          <span class="pkicker">The Royal Inventory</span>
           <span class="ppts"><b id="pv-bonus">0</b> / 35 pts</span>
         </div>
         <ul class="mini" id="mini-bonus"></ul>
@@ -833,10 +838,10 @@ function modalWelcome(){
 function markWelcomed(){try{localStorage.setItem(WELCOME_KEY,'1');}catch(e){}}
 var MODALS={
   welcome:{title:'Ciao, Alice!',sub:'a letter from the cartographer',render:modalWelcome},
-  main:{title:'Know Your People',sub:'Main Qvest · the seven questions',render:modalMain},
-  side:{title:'Act Like a Real Princess',sub:'Side Qvests · proofs, not activities',render:modalSide},
-  bonus:{title:'The Royal Inventory',sub:'Bonvs Qvests · runs all day underneath everything',render:modalBonus},
-  dip:{title:'Foreign Relations',sub:'Diplomacy · a selfie earns it, a drink doubles it',render:modalDip},
+  main:{title:'Main Qvest',sub:'Know Your People · the seven questions',render:modalMain},
+  side:{title:'Side Qvests',sub:'Act Like a Real Princess · proofs, not activities',render:modalSide},
+  bonus:{title:'Bonvs Qvests',sub:'The Royal Inventory · runs all day underneath everything',render:modalBonus},
+  dip:{title:'Diplomacy',sub:'Foreign Relations · a selfie earns it, a drink doubles it',render:modalDip},
   tally:{title:'The Royal Treasury',sub:'the tally of the day',render:modalTally}
 };
 function openModal(name){

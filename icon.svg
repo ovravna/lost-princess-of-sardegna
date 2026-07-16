@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <symbol id="moor" viewBox="0 0 100 100">
+      <path fill="#221b11" d="M47,10 C61,6 73,14 76,26 C77,30 80,34 83,38 C85,41 82,42.5 79,42.5 C80,45.5 82,48 80,50 C78,52 76,51 75,52 C77,55 76.5,58 73,60 C70,62 66,61 64,63 C64,68 65.5,74 62,79 L63,91 C54,95 42,95 34,91 L36,74 C27,67 21,55 23,41 C25,24 33,14 47,10 Z"/>
+      <path fill="#f5eed8" stroke="#221b11" stroke-width="2" stroke-linejoin="round" d="M25,41 C38,26 60,20 78,29 L74.5,40 C58,32.5 40,36 29.5,50 Z"/>
+      <path fill="#f5eed8" stroke="#221b11" stroke-width="1.6" stroke-linejoin="round" d="M26,42 L11,34 L18,47 Z"/>
+      <path fill="#f5eed8" stroke="#221b11" stroke-width="1.6" stroke-linejoin="round" d="M26,45 L9,47 L20,54 Z"/>
+    </symbol>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#2a2218"/>
+      <stop offset="0.6" stop-color="#1c1712"/>
+      <stop offset="1" stop-color="#120e0a"/>
+    </radialGradient>
+    <clipPath id="shieldClip"><path d="M12,10 H108 V58 C108,90 87,110 60,124 C33,110 12,90 12,58 Z"/></clipPath>
+  </defs>
+
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <g transform="translate(90,72) scale(2.76)">
+    <path d="M12,10 H108 V58 C108,90 87,110 60,124 C33,110 12,90 12,58 Z" fill="#f5eed8"/>
+    <g clip-path="url(#shieldClip)">
+      <rect x="52" y="0" width="16" height="134" fill="#a4161a"/>
+      <rect x="0" y="54" width="120" height="16" fill="#a4161a"/>
+      <use href="#moor" x="16" y="16" width="32" height="32"/>
+      <use href="#moor" x="72" y="16" width="32" height="32"/>
+      <use href="#moor" x="18" y="70" width="32" height="32"/>
+      <use href="#moor" x="70" y="70" width="32" height="32"/>
+    </g>
+    <path d="M12,10 H108 V58 C108,90 87,110 60,124 C33,110 12,90 12,58 Z" fill="none" stroke="#221b11" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M8,6 H112" stroke="#221b11" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>
