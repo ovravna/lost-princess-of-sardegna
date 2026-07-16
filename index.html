@@ -78,10 +78,10 @@ button{font-family:var(--serif);color:var(--ink);cursor:pointer}
 .st4{width:120px;height:120px;left:-24px;top:220px;background:radial-gradient(closest-side,rgba(122,72,26,0) 50%,rgba(122,72,26,.11) 64%,rgba(122,72,26,0) 72%)}
 .st5{width:70px;height:66px;left:340px;bottom:8px;background:radial-gradient(closest-side,rgba(96,56,18,.13) 30%,rgba(96,56,18,.05) 55%,rgba(96,56,18,0) 70%)}
 
-/* grain + weathering vignette centred on Orosei (737,244) */
+/* grain + weathering vignette centred on Orosei (747,223) */
 .grain{position:absolute;inset:0;z-index:14;pointer-events:none;opacity:.5;border-radius:5px}
 .vignette{position:absolute;inset:0;z-index:15;pointer-events:none;border-radius:5px;mix-blend-mode:multiply;
-  background:radial-gradient(1150px 760px at 728px 234px, rgba(255,250,235,0) 26%, rgba(140,110,55,.10) 55%, rgba(104,78,34,.22) 78%, rgba(70,50,20,.38) 100%)}
+  background:radial-gradient(1150px 760px at 747px 223px, rgba(255,250,235,0) 26%, rgba(140,110,55,.10) 55%, rgba(104,78,34,.22) 78%, rgba(70,50,20,.38) 100%)}
 
 /* rhumb lines svg spans whole board, beneath panels */
 .rhumbs{position:absolute;inset:0;z-index:1;pointer-events:none}
@@ -365,50 +365,63 @@ li.done .mlab{color:var(--ink-soft)}
       <!-- the island -->
       <svg class="mapsvg" viewBox="0 0 410 470" aria-label="Old sailor’s map of Sardegna">
         <defs>
-          <radialGradient id="oroFade" gradientUnits="userSpaceOnUse" cx="226" cy="190" r="300">
+          <radialGradient id="oroFade" gradientUnits="userSpaceOnUse" cx="249" cy="176" r="330">
             <stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff"/>
             <stop offset=".75" stop-color="#9a9a9a"/><stop offset="1" stop-color="#5c5c5c"/>
           </radialGradient>
           <mask id="oroMask"><rect x="-40" y="-40" width="490" height="550" fill="url(#oroFade)"/></mask>
         </defs>
         <g mask="url(#oroMask)">
-          <!-- coast shading then coastline -->
-          <path class="coast2" d="M88,60 L84,42 L88,48 L94,58 Q98,66 104,64 L112,68 L120,63 L130,69 L138,63 L148,68 L156,61 L164,54 L168,45 L172,38 L177,43 L179,34 L185,40 L191,35 L197,43 L203,37 L207,47 L215,45 L213,55 L221,57 L217,65 L225,67 L215,73 L219,79 L227,79 L231,87 L227,95 L235,101 L227,111 L231,123 L226,133 L229,141 L237,151 L242,159 L235,167 L231,177 L228,185 L226,190 C218,202 211,214 213,230 C214,244 219,252 223,262 C226,272 229,280 235,290 L243,299 L247,308 L240,315 L236,329 L241,341 L234,353 L240,363 L233,371 L239,381 L246,391 L240,398 L231,394 L227,388 Q216,394 208,389 L196,384 L184,389 L174,387 L164,395 L154,403 L147,413 L139,423 L131,419 L125,428 L117,431 L112,423 L105,416 L101,420 L98,410 L95,399 L100,389 L94,377 L99,365 L92,353 L87,343 L94,335 Q102,330 104,320 L99,308 L89,301 L84,307 L81,298 L87,291 L91,283 L82,277 L88,270 L84,257 L89,243 L83,229 L87,215 L80,201 L75,192 L81,184 L77,172 L83,163 L73,158 L66,163 L61,156 L66,149 L72,147 L75,140 L68,133 L72,119 L66,107 L72,95 L68,83 L75,71 L82,65 Z"/>
-          <path class="coast" d="M88,60 L84,42 L88,48 L94,58 Q98,66 104,64 L112,68 L120,63 L130,69 L138,63 L148,68 L156,61 L164,54 L168,45 L172,38 L177,43 L179,34 L185,40 L191,35 L197,43 L203,37 L207,47 L215,45 L213,55 L221,57 L217,65 L225,67 L215,73 L219,79 L227,79 L231,87 L227,95 L235,101 L227,111 L231,123 L226,133 L229,141 L237,151 L242,159 L235,167 L231,177 L228,185 L226,190 C218,202 211,214 213,230 C214,244 219,252 223,262 C226,272 229,280 235,290 L243,299 L247,308 L240,315 L236,329 L241,341 L234,353 L240,363 L233,371 L239,381 L246,391 L240,398 L231,394 L227,388 Q216,394 208,389 L196,384 L184,389 L174,387 L164,395 L154,403 L147,413 L139,423 L131,419 L125,428 L117,431 L112,423 L105,416 L101,420 L98,410 L95,399 L100,389 L94,377 L99,365 L92,353 L87,343 L94,335 Q102,330 104,320 L99,308 L89,301 L84,307 L81,298 L87,291 L91,283 L82,277 L88,270 L84,257 L89,243 L83,229 L87,215 L80,201 L75,192 L81,184 L77,172 L83,163 L73,158 L66,163 L61,156 L66,149 L72,147 L75,140 L68,133 L72,119 L66,107 L72,95 L68,83 L75,71 L82,65 Z"/>
-          <!-- islets -->
-          <path class="islet" d="M62,38 C66,28 76,22 84,26 C80,34 70,40 62,38 Z"/>
-          <circle class="islet" cx="196" cy="26" r="2.4"/><circle class="islet" cx="204" cy="29" r="2"/><circle class="islet" cx="190" cy="29" r="1.6"/>
-          <path class="islet" d="M240,94 L250,89 L253,93 L243,97 Z"/>
-          <path class="islet" d="M92,428 C96,420 104,422 103,431 C99,438 92,436 92,428 Z"/>
-          <path class="islet" d="M76,412 C77,406 84,405 85,411 C84,416 77,417 76,412 Z"/>
+          <!-- coast shading then coastline — traced from the true shape of Sardinia -->
+          <path class="coast2" d="M180.6,36.8 L190.3,40.2 L201.3,48.9 L211.4,46.4 L218.6,56.3 L229.6,52.2 L229.9,64.1 L234.7,74.0 L244.4,76.3 L231.1,80.2 L226.0,88.4 L237.0,92.4 L240.9,97.9 L247.0,112.6 L256.7,127.7 L260.7,139.7 L264.2,154.4 L260.4,164.7 L250.8,175.1 L244.5,186.5 L240.7,196.9 L243.4,212.1 L245.7,229.9 L248.1,241.9 L250.8,247.4 L245.7,260.5 L244.4,277.3 L237.3,297.3 L235.9,318.4 L239.5,336.8 L238.5,348.7 L234.7,358.6 L228.4,378.6 L216.3,376.1 L206.3,368.2 L195.1,360.9 L181.8,364.8 L173.1,369.8 L168.0,377.0 L164.6,392.2 L157.0,406.8 L149.5,415.6 L135.0,409.8 L121.3,419.7 L112.6,407.5 L100.5,393.8 L97.9,379.5 L92.8,368.9 L88.2,356.8 L86.8,345.7 L90.4,320.7 L93.1,297.3 L94.2,283.0 L96.5,275.7 L104.2,265.1 L111.5,254.1 L100.2,240.3 L88.2,233.0 L86.8,229.9 L97.8,217.8 L96.8,200.8 L100.4,189.7 L99.0,169.5 L88.2,154.2 L78.2,147.9 L67.0,148.6 L58.6,144.5 L63.4,135.1 L67.0,116.5 L63.5,94.7 L63.4,83.6 L78.1,92.4 L88.2,101.1 L107.8,110.9 L128.6,98.8 L147.3,88.2 L163.2,85.2 L171.7,69.8 L173.2,56.1 L178.0,45.0 Z"/>
+          <path class="coast" d="M180.6,36.8 L190.3,40.2 L201.3,48.9 L211.4,46.4 L218.6,56.3 L229.6,52.2 L229.9,64.1 L234.7,74.0 L244.4,76.3 L231.1,80.2 L226.0,88.4 L237.0,92.4 L240.9,97.9 L247.0,112.6 L256.7,127.7 L260.7,139.7 L264.2,154.4 L260.4,164.7 L250.8,175.1 L244.5,186.5 L240.7,196.9 L243.4,212.1 L245.7,229.9 L248.1,241.9 L250.8,247.4 L245.7,260.5 L244.4,277.3 L237.3,297.3 L235.9,318.4 L239.5,336.8 L238.5,348.7 L234.7,358.6 L228.4,378.6 L216.3,376.1 L206.3,368.2 L195.1,360.9 L181.8,364.8 L173.1,369.8 L168.0,377.0 L164.6,392.2 L157.0,406.8 L149.5,415.6 L135.0,409.8 L121.3,419.7 L112.6,407.5 L100.5,393.8 L97.9,379.5 L92.8,368.9 L88.2,356.8 L86.8,345.7 L90.4,320.7 L93.1,297.3 L94.2,283.0 L96.5,275.7 L104.2,265.1 L111.5,254.1 L100.2,240.3 L88.2,233.0 L86.8,229.9 L97.8,217.8 L96.8,200.8 L100.4,189.7 L99.0,169.5 L88.2,154.2 L78.2,147.9 L67.0,148.6 L58.6,144.5 L63.4,135.1 L67.0,116.5 L63.5,94.7 L63.4,83.6 L78.1,92.4 L88.2,101.1 L107.8,110.9 L128.6,98.8 L147.3,88.2 L163.2,85.2 L171.7,69.8 L173.2,56.1 L178.0,45.0 Z"/>
+          <!-- the islands of Sardegna -->
+          <!-- Asinara: a bow of islands off the Stintino tip -->
+          <path class="islet" d="M77.5,54.5 L83,57.5 L83.5,62 L80,65.5 L75,64 L74,59 Z"/>
+          <path class="islet" d="M73.5,63.5 L77.5,66.5 L76.5,71 L72.5,72.5 L69.5,69.5 L70.5,65.5 Z"/>
+          <path class="islet" d="M68.5,71 L72.5,73.5 L71.5,77.5 L67.5,78.5 L65.5,75.5 L66,72.5 Z"/>
+          <circle class="islet" cx="66" cy="81.5" r="1.6"/>
+          <text x="70" y="49" text-anchor="middle" style="font-size:7.5px;font-style:italic;fill:#8b7d61;letter-spacing:.08em">Asinara</text>
+          <path class="islet" d="M218.2,40.1 L215.7,42.5 L213.0,44.8 L209.6,43.5 L207.3,41.6 L208.5,39.0 L212.1,37.9 L216.1,37.6 Z"/><!-- La Maddalena -->
+          <path class="islet" d="M223.3,44.4 L221.7,47.5 L219.3,49.1 L218.2,45.6 L217.8,41.5 L220.4,40.1 L222.7,40.5 Z"/><!-- Caprera -->
+          <path class="islet" d="M255.7,94.0 L253.9,95.2 L248.8,93.8 L245.7,91.6 L245.2,89.5 L250.1,90.4 L255.3,92.0 Z"/><!-- Tavolara -->
+          <path class="islet" d="M254.8,98.0 L254.3,99.7 L252.3,99.3 L251.0,98.0 L252.2,96.5 L254.1,96.6 Z"/><!-- Molara -->
+          <path class="islet" d="M77.8,375.4 L76.7,380.8 L72.0,381.3 L67.1,381.1 L66.9,375.4 L67.4,369.9 L72.0,368.6 L76.1,370.6 Z"/><!-- San Pietro -->
+          <path class="islet" d="M98.0,398.2 L95.7,404.2 L92.4,406.6 L89.0,404.6 L89.0,397.6 L89.7,390.3 L93.5,390.2 L97.1,391.1 Z"/><!-- Sant'Antioco -->
           <!-- mountains: Supramonte & Gennargentu -->
           <g class="mtn">
-            <path d="M186,206 l4,-7 l4,7"/><path d="M196,220 l4,-7 l4,7"/><path d="M178,228 l4,-7 l4,7"/>
-            <path d="M190,244 l4,-7 l4,7"/><path d="M176,258 l4,-7 l4,7"/><path d="M198,262 l4,-7 l4,7"/>
-            <path d="M208,120 l3.5,-6 l3.5,6"/><path d="M198,132 l3.5,-6 l3.5,6"/>
+            <path d="M214,208 l4,-7 l4,7"/><path d="M224,220 l4,-7 l4,7"/><path d="M206,224 l4,-7 l4,7"/>
+            <path d="M216,238 l4,-7 l4,7"/><path d="M196,244 l4,-7 l4,7"/><path d="M206,254 l4,-7 l4,7"/>
+            <path d="M188,254 l3.5,-6 l3.5,6"/><path d="M198,264 l3.5,-6 l3.5,6"/>
           </g>
+          <!-- faint name of the island, arched across the north -->
+          <path id="sardArc" d="M78,200 Q165,150 254,178" fill="none" stroke="none"/>
+          <text style="font-size:21px;font-style:italic;letter-spacing:.3em;fill:#8b7d61;opacity:.42"><textPath href="#sardArc" startOffset="52%" text-anchor="middle">Sardegna</textPath></text>
           <!-- depth soundings -->
-          <text class="depth" x="252" y="212">9</text><text class="depth" x="262" y="240">14</text>
-          <text class="depth" x="250" y="266">27</text><text class="depth" x="256" y="300">45</text>
-          <text class="depth" x="252" y="166">7</text>
+          <text class="depth" x="280" y="152">9</text><text class="depth" x="284" y="207">14</text>
+          <text class="depth" x="278" y="257">27</text><text class="depth" x="282" y="312">45</text>
+          <text class="depth" x="276" y="120">7</text>
           <!-- towns -->
           <g>
-            <circle class="town" cx="220" cy="135" r="1.8"/>
-            <path class="shipl" d="M216,127 h4 v-5 l-2,-2 l-2,2 Z"/>
-            <text class="tlab" x="236" y="134">Posada</text>
-            <circle class="town" cx="172" cy="192" r="1.8"/><text class="tlab" x="134" y="189">Nuoro</text>
-            <circle class="town" cx="186" cy="212" r="1.8"/><text class="tlab" x="148" y="216">Oliena</text>
-            <circle class="town" cx="135" cy="240" r="1.8"/><text class="tlab" x="98" y="237">Sedilo</text>
-            <circle class="town" cx="172" cy="390" r="2.2"/><text class="tlab big" x="122" y="381">CAGLIARI</text>
+            <circle class="town" cx="252" cy="136" r="1.8"/>
+            <path class="shipl" d="M248,128 h4 v-5 l-2,-2 l-2,2 Z"/>
+            <text class="tlab" x="214" y="134" text-anchor="end">Posada</text>
+            <circle class="town" cx="204" cy="186" r="1.8"/><text class="tlab" x="198" y="183" text-anchor="end">Nuoro</text>
+            <circle class="town" cx="212" cy="194" r="1.8"/><text class="tlab" x="207" y="201" text-anchor="end">Oliena</text>
+            <circle class="town" cx="153" cy="210" r="1.8"/><text class="tlab" x="147" y="207" text-anchor="end">Sedilo</text>
+            <circle class="town" cx="109" cy="120" r="2.2"/><text class="tlab big" x="112" y="133" text-anchor="middle">SASSARI</text>
+            <circle class="town" cx="225" cy="89" r="2.2"/><text class="tlab big" x="218" y="87" text-anchor="end">OLBIA</text>
+            <path d="M177.0,354.0 L178.5,358.0 L182.7,358.1 L179.4,360.8 L180.5,364.9 L177.0,362.5 L173.5,364.9 L174.6,360.8 L171.3,358.1 L175.5,358.0 Z" fill="#a4161a" stroke="#221b11" stroke-width=".8" stroke-linejoin="round"/>
+            <text class="tlab big" x="168" y="352" text-anchor="end">CAGLIARI</text>
           </g>
           <!-- Orosei: X marks the start -->
           <g>
-            <path class="xmark" d="M214.5,183.5 l11,11 M225.5,183.5 l-11,11"/>
-            <circle cx="220" cy="189" r="8.5" fill="none" stroke="#a4161a" stroke-width="1" stroke-dasharray="2 2.5"/>
-            <text class="olab" x="236" y="187">OROSEI</text>
-            <text class="start" x="236" y="198">· you start here ·</text>
+            <path class="xmark" d="M243.9,170.5 l11,11 M254.9,170.5 l-11,11"/>
+            <circle cx="249.4" cy="176" r="8.5" fill="none" stroke="#a4161a" stroke-width="1" stroke-dasharray="2 2.5"/>
+            <text class="olab" x="265" y="174">OROSEI</text>
+            <text class="start" x="265" y="185">· you start here ·</text>
           </g>
-          <text class="tlab" x="234" y="234" transform="rotate(78 234 234)" style="font-style:italic;fill:#8b7d61">G. di Orosei</text>
+          <text class="tlab" x="258" y="212" transform="rotate(82 258 212)" style="font-style:italic;fill:#8b7d61">G. di Orosei</text>
           <!-- sea creatures & craft -->
           <g class="serp">
             <path d="M295,96 c5,-12 17,-12 22,-1"/>
@@ -946,7 +959,7 @@ document.getElementById('tracker').addEventListener('click',function(){openModal
 /* ————————————— decorative svg bits built by loop ————————————— */
 (function(){
   var g=document.getElementById('rh'),h='';
-  var cx=728,cy=234;
+  var cx=747,cy=223;
   for(var i=0;i<32;i++){
     var a=i*Math.PI/16,x=cx+Math.cos(a)*1700,y=cy+Math.sin(a)*1700;
     h+='<line x1="'+cx+'" y1="'+cy+'" x2="'+x.toFixed(0)+'" y2="'+y.toFixed(0)+
